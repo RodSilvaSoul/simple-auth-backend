@@ -18,7 +18,10 @@ import {
   SendForgotPasswordEmailController,
 } from '.';
 
-jest.genMockFromModule('path');
+jest.mock('path', () => ({
+  resolve: () => 'any_pash',
+  dirname: () => 'any_dirname',
+}));
 
 let sendForgotPasswordEmailUseCase: SendForgotPasswordEmailUseCase;
 let sendForgotPasswordEmailController: SendForgotPasswordEmailController;
@@ -54,10 +57,14 @@ describe('send forgot password email', () => {
   it('should send a email reset password email for a registred user', async () => {
     const email = faker.internet.email();
 
-    await userRepository.add({
+    userRepository.users.push({
+      id: faker.datatype.uuid(),
+      avatar_url: 'any_url',
+      created_at: faker.date.soon(),
       email,
       name: faker.internet.userName(),
       password: faker.internet.password(),
+      isVerified: true,
     });
 
     const httpRequest = {
@@ -130,17 +137,15 @@ describe('send forgot password email', () => {
   it('should sendForgotPasswordEmailUseCase call correctly your methods', async () => {
     const email = faker.internet.email();
 
-    await userRepository.add({
+    userRepository.users.push({
+      id: faker.datatype.uuid(),
+      avatar_url: 'any_url',
+      created_at: faker.date.soon(),
+      email,
       name: faker.internet.userName(),
       password: faker.internet.password(),
-      email,
+      isVerified: true,
     });
-
-    const httpRequest = {
-      body: {
-        email,
-      },
-    };
 
     const expires_in = faker.date.recent();
 
@@ -155,13 +160,13 @@ describe('send forgot password email', () => {
     const addSpy = jest.spyOn(tokenRepository, 'add');
     const sendMailSpy = jest.spyOn(emailProvider, 'sendMail');
 
-    await sendForgotPasswordEmailController.handle(httpRequest);
+    await sendForgotPasswordEmailUseCase.execute(email);
 
     expect(findByEmailSpy).toBeCalledWith(email);
-    expect(resolveSpy).toBeCalled();
+
     expect(createSpy).toBeCalled();
     expect(addDaysSpy).toBeCalledWith(3);
-
+    expect(resolveSpy).toBeCalled();
     expect(addSpy).toBeCalledWith(
       expect.objectContaining({
         token: 'any_token',

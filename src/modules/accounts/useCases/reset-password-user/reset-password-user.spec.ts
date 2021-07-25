@@ -7,9 +7,9 @@ import {
 import { DayjsFacade } from '@shared/container/providers/date/implementations';
 import { BcryptFacade } from '@shared/container/providers/hasher/implementations';
 import { BodyRequestValidator } from '@shared/container/providers/validator/implementations';
+import { InvalidTokenError } from '@shared/errors/useCase';
 import { serverError, unauthorized } from '@shared/http';
 
-import { InvalidTokenError } from './errors';
 import { ResetPasswordUserController } from './reset-password-user-controller';
 import { ResetPasswordUserUseCase } from './reset-password-user-useCase';
 

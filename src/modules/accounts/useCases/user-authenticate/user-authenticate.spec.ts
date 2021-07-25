@@ -11,7 +11,6 @@ import { BodyRequestValidator } from '@shared/container/providers/validator/impl
 import { EmptyBodyError, MissingParamError } from '@shared/errors/validator';
 import {
   badRequest,
-  HttpRequest,
   serverError,
   unauthorized,
 } from '@shared/http';
@@ -29,13 +28,6 @@ let bcryptFacade: BcryptFacade;
 let dayjsFacade: DayjsFacade;
 let bodyRequestValidator: BodyRequestValidator;
 
-let user_db: {
-  name: string;
-  email: string;
-  password: string;
-};
-
-let request_body: HttpRequest;
 describe('user authenticate', () => {
   beforeEach(async () => {
     tokenRepository = new TokenRepositoryInMemory();
@@ -57,24 +49,24 @@ describe('user authenticate', () => {
       userAuthenticateUseCase,
       bodyRequestValidator,
     );
-
+  });
+  it('should authenticate a registered user', async () => {
     const password = faker.internet.password();
     const passwordHash = await bcryptFacade.hash(password);
 
-    user_db = {
+    const user_db = {
       name: faker.internet.userName(),
       email: faker.internet.email(),
       password: passwordHash,
     };
 
-    request_body = {
+    const request_body = {
       body: {
         ...user_db,
         password,
       },
     };
-  });
-  it('should authenticate a registered user', async () => {
+
     const { id } = await userRepository.add(user_db);
 
     const httpReponse = await userAuthenticateController.handle(request_body);
@@ -98,6 +90,22 @@ describe('user authenticate', () => {
   });
 
   it('should not authenticate a user with invalid credentials', async () => {
+    const password = faker.internet.password();
+    const passwordHash = await bcryptFacade.hash(password);
+
+    const user_db = {
+      name: faker.internet.userName(),
+      email: faker.internet.email(),
+      password: passwordHash,
+    };
+
+    const request_body = {
+      body: {
+        ...user_db,
+        password,
+      },
+    };
+
     await userRepository.add(user_db);
 
     const httpReponse = await userAuthenticateController.handle({
@@ -117,13 +125,24 @@ describe('user authenticate', () => {
   });
 
   it('should not accpet a body request missing a requerid field', async () => {
-    delete request_body.body.password;
+    const request_body = {
+      body: {
+        email: faker.internet.email(),
+      },
+    };
     const httpResponse = await userAuthenticateController.handle(request_body);
 
     expect(httpResponse).toEqual(badRequest(new MissingParamError('password')));
   });
 
   it('should returns a server error if userAuthenticateUseCase.execute() throws an error', async () => {
+    const request_body = {
+      body: {
+        email: faker.internet.email(),
+        password: faker.internet.password(),
+      },
+    };
+
     jest
       .spyOn(userAuthenticateUseCase, 'execute')
       .mockRejectedValueOnce(new Error());
@@ -174,6 +193,13 @@ describe('user authenticate', () => {
   });
 
   it('should userAuthenticateController call your methods correctly', async () => {
+    const request_body = {
+      body: {
+        email: faker.internet.email(),
+        password: faker.internet.password(),
+      },
+    };
+
     const checkSpy = jest.spyOn(bodyRequestValidator, 'check');
     const executeSpy = jest.spyOn(userAuthenticateUseCase, 'execute');
 

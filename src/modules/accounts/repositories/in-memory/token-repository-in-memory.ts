@@ -1,19 +1,19 @@
 import { CreteUserTokenDTO } from '@modules/accounts/dtos';
-import { RefreshToken } from '@modules/accounts/infra/typorm/entities';
+import { UserTokens } from '@modules/accounts/infra/typorm/entities';
 import { NotFoundError } from '@shared/errors/database-query';
 import { Either, left, right } from '@shared/utils';
 
 import { ITokenRepository } from '../IToken-repository';
 
 export class TokenRepositoryInMemory implements ITokenRepository {
-  refreshTokens: RefreshToken[] = [];
+  refreshTokens: UserTokens[] = [];
 
   async add({
     expires_in,
     id_user,
     token,
-  }: CreteUserTokenDTO): Promise<RefreshToken> {
-    const refreshToken = new RefreshToken();
+  }: CreteUserTokenDTO): Promise<UserTokens> {
+    const refreshToken = new UserTokens();
 
     Object.assign(refreshToken, {
       expires_in,
@@ -27,7 +27,7 @@ export class TokenRepositoryInMemory implements ITokenRepository {
   }
   async findByUserId(
     userId: string,
-  ): Promise<Either<NotFoundError, RefreshToken>> {
+  ): Promise<Either<NotFoundError, UserTokens>> {
     const refreshToken = this.refreshTokens.find(
       (token) => token.id_user === userId,
     );
@@ -38,9 +38,7 @@ export class TokenRepositoryInMemory implements ITokenRepository {
 
     return left(new NotFoundError(userId));
   }
-  async findByToken(
-    token: string,
-  ): Promise<Either<NotFoundError, RefreshToken>> {
+  async findByToken(token: string): Promise<Either<NotFoundError, UserTokens>> {
     const refreshToken = this.refreshTokens.find(
       (refeshToken) => refeshToken.token === token,
     );
@@ -52,9 +50,7 @@ export class TokenRepositoryInMemory implements ITokenRepository {
     return left(new NotFoundError(token));
   }
   async deleteById(id: string): Promise<void> {
-    const refreshTokens = this.refreshTokens.filter(
-      (token) => token.id !== id,
-    );
+    const refreshTokens = this.refreshTokens.filter((token) => token.id !== id);
 
     this.refreshTokens = refreshTokens;
   }
