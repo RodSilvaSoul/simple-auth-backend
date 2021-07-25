@@ -60,6 +60,7 @@ describe('Reset password user', () => {
       email: faker.internet.email(),
       name: faker.internet.userName(),
       password: old_password,
+      isVerified: true,
     });
 
     const request_body = {
@@ -162,6 +163,7 @@ describe('Reset password user', () => {
       email: faker.internet.email(),
       name: faker.internet.userName(),
       password: faker.internet.password(),
+      isVerified: true,
     });
 
     const findBytokenSpy = jest.spyOn(tokenRepository, 'findByToken');

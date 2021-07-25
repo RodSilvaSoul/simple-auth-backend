@@ -1,26 +1,22 @@
 import { injectable } from 'tsyringe';
 import { getRepository, Repository } from 'typeorm';
 
-import { CreteUserRefreshTokenDTO } from '@modules/accounts/dtos';
+import { CreteUserTokenDTO } from '@modules/accounts/dtos';
 import { ITokenRepository } from '@modules/accounts/repositories';
 import { NotFoundError } from '@shared/errors/database-query';
 import { Either, left, right } from '@shared/utils';
 
-import { RefreshToken } from '../entities';
+import { UserTokens } from '../entities';
 
 @injectable()
 export class TokenRepository implements ITokenRepository {
-  private readonly repository: Repository<RefreshToken>;
+  private readonly repository: Repository<UserTokens>;
 
   constructor() {
-    this.repository = getRepository(RefreshToken);
+    this.repository = getRepository(UserTokens);
   }
 
-  add({
-    expires_in,
-    id_user,
-    token,
-  }: CreteUserRefreshTokenDTO): Promise<RefreshToken> {
+  add({ expires_in, id_user, token }: CreteUserTokenDTO): Promise<UserTokens> {
     const refreshToken = this.repository.create({
       expires_in,
       id_user,
@@ -33,7 +29,7 @@ export class TokenRepository implements ITokenRepository {
   }
   async findByUserId(
     userId: string,
-  ): Promise<Either<NotFoundError, RefreshToken>> {
+  ): Promise<Either<NotFoundError, UserTokens>> {
     const queryResult = await this.repository.findOne({
       where: {
         id_user: userId,
@@ -49,7 +45,7 @@ export class TokenRepository implements ITokenRepository {
 
   async findByToken(
     token: string,
-  ): Promise<Either<NotFoundError, RefreshToken>> {
+  ): Promise<Either<NotFoundError, UserTokens>> {
     const queryResult = await this.repository.findOne({
       where: {
         token,

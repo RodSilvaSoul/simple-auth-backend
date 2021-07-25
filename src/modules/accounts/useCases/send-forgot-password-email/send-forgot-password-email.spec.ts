@@ -9,6 +9,7 @@ import { DayjsFacade } from '@shared/container/providers/date/implementations';
 import { EmailProviderInMemory } from '@shared/container/providers/email/in-memory';
 import { UuidFacade } from '@shared/container/providers/uuid/implementations';
 import { BodyRequestValidator } from '@shared/container/providers/validator/implementations';
+import { UserNotFoundError } from '@shared/errors/useCase';
 import { notFound, serverError } from '@shared/http';
 import { right } from '@shared/utils';
 
@@ -16,7 +17,6 @@ import {
   SendForgotPasswordEmailUseCase,
   SendForgotPasswordEmailController,
 } from '.';
-import { UserNotFoundError } from './errors';
 
 jest.genMockFromModule('path');
 

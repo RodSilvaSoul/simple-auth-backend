@@ -1,7 +1,11 @@
 import { IMailProvider } from '../IMail-provider';
 
 export class EmailProviderInMemory implements IMailProvider {
+  async verifyMail(email: string): Promise<void> {
+    this.verifidedEmails.push(email);
+  }
   emails = [];
+  verifidedEmails = [];
 
   async sendMail(
     to: string,
@@ -10,7 +14,10 @@ export class EmailProviderInMemory implements IMailProvider {
     path: string,
   ): Promise<void> {
     this.emails.push({
-      to, subject, variables, path,
+      to,
+      subject,
+      variables,
+      path,
     });
   }
 }

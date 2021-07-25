@@ -40,4 +40,16 @@ export class UserRepositoryInMemory implements IUserRepository {
 
     return left(new NotFoundError(id));
   }
+
+  async isEmailVerified(
+    email: string,
+  ): Promise<Either<NotFoundError, boolean>> {
+    const userExists = this.users.find((user) => user.email === email);
+
+    if (userExists) {
+      return right(userExists.isVerified);
+    }
+
+    return left(new NotFoundError(email));
+  }
 }

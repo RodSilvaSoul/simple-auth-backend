@@ -10,8 +10,8 @@ import { v4 as uuidV4 } from 'uuid';
 
 import { User } from '.';
 
-@Entity('refresh_tokens')
-class RefreshToken {
+@Entity('user_tokens')
+export class UserTokens {
   @PrimaryColumn()
   id: string;
 
@@ -37,5 +37,3 @@ class RefreshToken {
     }
   }
 }
-
-export { RefreshToken };

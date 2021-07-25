@@ -5,4 +5,6 @@ export interface IMailProvider {
     variables: any,
     path: string,
   ): Promise<void>;
+
+  verifyMail(email: string): Promise<void>;
 }

@@ -20,6 +20,9 @@ class User {
   @Column()
   avatar_url: string;
 
+  @Column()
+  isVerified: boolean;
+
   @CreateDateColumn()
   created_at: Date;
 

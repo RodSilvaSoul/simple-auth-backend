@@ -6,9 +6,8 @@ import {
   IUserRepository,
 } from '@modules/accounts/repositories';
 import { IDateProvider, IHasherProvider } from '@shared/container/providers';
+import { InvalidTokenError } from '@shared/errors/useCase';
 import { Either, left, right } from '@shared/utils/either';
-
-import { InvalidTokenError } from './errors';
 
 @injectable()
 export class ResetPasswordUserUseCase {

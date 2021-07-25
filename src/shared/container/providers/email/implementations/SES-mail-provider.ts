@@ -9,14 +9,23 @@ import { IMailProvider } from '../IMail-provider';
 @injectable()
 export class SESMailProvider implements IMailProvider {
   private client: Transporter;
+  private SES: SES;
 
   constructor() {
-    this.client = nodemailer.createTransport({
-      SES: new SES({
-        apiVersion: '2010-12-01',
-        region: process.env.AWS_REGION,
-      }),
+    this.SES = new SES({
+      apiVersion: '2010-12-01',
+      region: process.env.AWS_REGION,
     });
+
+    this.client = nodemailer.createTransport({
+      SES: this.SES,
+    });
+  }
+
+  async verifyMail(email: string): Promise<void> {
+    await this.SES.verifyEmailIdentity({
+      EmailAddress: email,
+    }).promise();
   }
 
   async sendMail(

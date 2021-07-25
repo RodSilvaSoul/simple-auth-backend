@@ -6,6 +6,8 @@ import {
   ResetPasswordUserController,
   UserAuthenticateController,
   SendForgotPasswordEmailController,
+  VerifyEmailController,
+  SendVerifyEmailController,
 } from '@modules/accounts/useCases';
 import { expressRouterAdapter } from '@shared/adapters';
 
@@ -14,8 +16,14 @@ const userAuthenticateController = container.resolve(
   UserAuthenticateController,
 );
 
-const sendForgotPasswordEmailController = container.resolve(SendForgotPasswordEmailController);
-const resetPasswordUserController = container.resolve(ResetPasswordUserController);
+const sendForgotPasswordEmailController = container.resolve(
+  SendForgotPasswordEmailController,
+);
+const resetPasswordUserController = container.resolve(
+  ResetPasswordUserController,
+);
+const verifyEmailController = container.resolve(VerifyEmailController);
+const sendVerifyEmailController = container.resolve(SendVerifyEmailController);
 
 export default (router: Router) => {
   router.post('/sign', expressRouterAdapter(createUserController));
@@ -28,4 +36,11 @@ export default (router: Router) => {
     '/password/reset',
     expressRouterAdapter(resetPasswordUserController),
   );
+
+  router.post(
+    '/send-verify-email',
+    expressRouterAdapter(sendVerifyEmailController),
+  );
+
+  router.post('/verify-email', expressRouterAdapter(verifyEmailController));
 };

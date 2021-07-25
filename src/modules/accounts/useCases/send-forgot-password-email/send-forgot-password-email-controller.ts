@@ -44,7 +44,6 @@ export class SendForgotPasswordEmailController implements IController {
 
       return ok();
     } catch (error) {
-      console.error(error);
       return serverError();
     }
   }

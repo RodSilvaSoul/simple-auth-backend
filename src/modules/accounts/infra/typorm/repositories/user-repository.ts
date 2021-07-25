@@ -59,4 +59,16 @@ export class UserRepository implements IUserRepository {
 
     return left(new NotFoundError(id));
   }
+
+  async isEmailVerified(
+    email: string,
+  ): Promise<Either<NotFoundError, boolean>> {
+    const queryResult = await this.repository.findOne({ email });
+
+    if (queryResult) {
+      return right(queryResult.isVerified);
+    }
+
+    return left(new NotFoundError(email));
+  }
 }

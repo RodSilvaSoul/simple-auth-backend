@@ -2,52 +2,44 @@ import { singleton, inject } from 'tsyringe';
 
 import { IValidator } from '@shared/container/providers';
 import { BodyRequestValidatorParams } from '@shared/container/providers/validator/implementations';
-import { InvalidTokenError } from '@shared/errors/useCase';
 import {
   badRequest,
   HttpRequest,
   HttpResponse,
+  notFound,
   ok,
   serverError,
-  unauthorized,
 } from '@shared/http';
 import { IController } from '@shared/ports';
 
-import { ResetPasswordUserUseCase } from './reset-password-user-useCase';
+import { SendVerifyEmailUseCase } from './send-verify-email-useCase';
 
 @singleton()
-export class ResetPasswordUserController implements IController {
+export class SendVerifyEmailController implements IController {
   constructor(
-    @inject('ResetPasswordUserUseCase')
-    private readonly resetPasswordUserUseCase: ResetPasswordUserUseCase,
+    @inject('SendVerifyEmailUseCase')
+    private readonly sendVerifyEmailUseCase: SendVerifyEmailUseCase,
     @inject('BodyRequestValidator')
     private readonly bodyRequestValidator: IValidator<BodyRequestValidatorParams>,
   ) {}
 
-  async handle({ body, query }: HttpRequest): Promise<HttpResponse> {
+  async handle({ body }: HttpRequest): Promise<HttpResponse> {
     try {
       const isBodyValid = this.bodyRequestValidator.check({
         body,
-        fields: ['password'],
+        fields: ['email'],
       });
 
       if (isBodyValid.isLeft()) {
         return badRequest(isBodyValid.value);
       }
-      const { token } = query;
-      if (!token) {
-        return badRequest(new InvalidTokenError());
-      }
 
-      const { password } = body;
+      const { email } = body;
 
-      const result = await this.resetPasswordUserUseCase.execute({
-        password,
-        token,
-      });
+      const result = await this.sendVerifyEmailUseCase.execute(email);
 
       if (result.isLeft()) {
-        return unauthorized(result.value);
+        return notFound(result.value);
       }
 
       return ok();

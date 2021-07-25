@@ -8,4 +8,5 @@ export interface IUserRepository {
   add(params: CreateUserDTO): Promise<User>;
   findByEmail(email: string): Promise<Either<NotFoundError, User>>;
   findById(id: string): Promise<Either<NotFoundError, User>>;
+  isEmailVerified(email: string): Promise<Either<NotFoundError, boolean>>;
 }

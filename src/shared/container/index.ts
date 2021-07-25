@@ -14,6 +14,8 @@ import {
   CreaUserUserCase,
   ResetPasswordUserUseCase,
   SendForgotPasswordEmailUseCase,
+  SendVerifyEmailUseCase,
+  VerifyEmailUseCase,
 } from '@modules/accounts/useCases';
 
 container.registerSingleton<ITokenRepository>(
@@ -41,4 +43,14 @@ container.registerSingleton<ResetPasswordUserUseCase>(
 container.registerSingleton<SendForgotPasswordEmailUseCase>(
   'SendForgotPasswordEmailUseCase',
   SendForgotPasswordEmailUseCase,
+);
+
+container.registerSingleton<SendVerifyEmailUseCase>(
+  'SendVerifyEmailUseCase',
+  SendVerifyEmailUseCase,
+);
+
+container.registerSingleton<VerifyEmailUseCase>(
+  'VerifyEmailUseCase',
+  VerifyEmailUseCase,
 );

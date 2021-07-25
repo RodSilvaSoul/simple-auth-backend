@@ -1,10 +1,12 @@
 import 'reflect-metadata';
-import 'dotenv/config';
+import { config } from 'dotenv';
 import express from 'express';
 import '@shared/container';
 
 import { setupMiddlewares } from './setupMiddlewares';
 import { setupRoutes } from './setupRoutes';
+
+config();
 
 const app = express();
 
