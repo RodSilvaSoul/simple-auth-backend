@@ -50,6 +50,66 @@ describe('user authenticate', () => {
       bodyRequestValidator,
     );
   });
+  it('should userAuthenticateUseCase call your methods correctly', async () => {
+    const password = faker.internet.password();
+    const email = faker.internet.email();
+    const expires_in = faker.date.future();
+
+    await userRepository.add({
+      name: faker.internet.userName(),
+      email,
+      password,
+    });
+
+    const findByEmailSpy = jest.spyOn(userRepository, 'findByEmail');
+    const compareSpy = jest
+      .spyOn(bcryptFacade, 'compare')
+      .mockResolvedValueOnce(true);
+    const createTokenSpy = jest
+      .spyOn(jwtFacade, 'createToken')
+      .mockResolvedValue('any_jwt');
+    const addDaysSpy = jest
+      .spyOn(dayjsFacade, 'addDays')
+      .mockReturnValueOnce(expires_in);
+    const addSpy = jest.spyOn(tokenRepository, 'add');
+
+    await userAuthenticateUseCase.execute({
+      password,
+      email,
+    });
+
+    expect(findByEmailSpy).toBeCalledWith(email);
+    expect(compareSpy).toBeCalledWith(password, password);
+    expect(createTokenSpy).toBeCalledTimes(2);
+    expect(addDaysSpy).toBeCalled();
+    expect(addSpy).toBeCalledWith(
+      expect.objectContaining({
+        token: 'any_jwt',
+        expires_in,
+      }),
+    );
+  });
+
+  it('should userAuthenticateController call your methods correctly', async () => {
+    const request_body = {
+      body: {
+        email: faker.internet.email(),
+        password: faker.internet.password(),
+      },
+    };
+
+    const checkSpy = jest.spyOn(bodyRequestValidator, 'check');
+    const executeSpy = jest.spyOn(userAuthenticateUseCase, 'execute');
+
+    await userAuthenticateController.handle(request_body);
+
+    expect(checkSpy).toBeCalledWith({
+      body: request_body.body,
+      fields: ['password', 'email'],
+    });
+
+    expect(executeSpy).toBeCalledWith(request_body.body);
+  });
   it('should authenticate a registered user', async () => {
     const password = faker.internet.password();
     const passwordHash = await bcryptFacade.hash(password);
@@ -150,66 +210,5 @@ describe('user authenticate', () => {
     const httpResponse = await userAuthenticateController.handle(request_body);
 
     expect(httpResponse).toEqual(serverError());
-  });
-
-  it('should userAuthenticateUseCase call your methods correctly', async () => {
-    const password = faker.internet.password();
-    const email = faker.internet.email();
-    const expires_in = faker.date.future();
-
-    await userRepository.add({
-      name: faker.internet.userName(),
-      email,
-      password,
-    });
-
-    const findByEmailSpy = jest.spyOn(userRepository, 'findByEmail');
-    const compareSpy = jest
-      .spyOn(bcryptFacade, 'compare')
-      .mockResolvedValueOnce(true);
-    const createTokenSpy = jest
-      .spyOn(jwtFacade, 'createToken')
-      .mockResolvedValue('any_jwt');
-    const addDaysSpy = jest
-      .spyOn(dayjsFacade, 'addDays')
-      .mockReturnValueOnce(expires_in);
-    const addSpy = jest.spyOn(tokenRepository, 'add');
-
-    await userAuthenticateUseCase.execute({
-      password,
-      email,
-    });
-
-    expect(findByEmailSpy).toBeCalledWith(email);
-    expect(compareSpy).toBeCalledWith(password, password);
-    expect(createTokenSpy).toBeCalledTimes(2);
-    expect(addDaysSpy).toBeCalled();
-    expect(addSpy).toBeCalledWith(
-      expect.objectContaining({
-        token: 'any_jwt',
-        expires_in,
-      }),
-    );
-  });
-
-  it('should userAuthenticateController call your methods correctly', async () => {
-    const request_body = {
-      body: {
-        email: faker.internet.email(),
-        password: faker.internet.password(),
-      },
-    };
-
-    const checkSpy = jest.spyOn(bodyRequestValidator, 'check');
-    const executeSpy = jest.spyOn(userAuthenticateUseCase, 'execute');
-
-    await userAuthenticateController.handle(request_body);
-
-    expect(checkSpy).toBeCalledWith({
-      body: request_body.body,
-      fields: ['password', 'email'],
-    });
-
-    expect(executeSpy).toBeCalledWith(request_body.body);
   });
 });

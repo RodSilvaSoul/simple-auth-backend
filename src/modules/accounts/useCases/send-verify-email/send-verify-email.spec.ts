@@ -10,21 +10,18 @@ import { EmailProviderInMemory } from '@shared/container/providers/email/in-memo
 import { UuidFacade } from '@shared/container/providers/uuid/implementations';
 import { BodyRequestValidator } from '@shared/container/providers/validator/implementations';
 import { UserNotFoundError } from '@shared/errors/useCase';
-import { notFound, serverError } from '@shared/http';
-import { right } from '@shared/utils';
+import { EmptyBodyError } from '@shared/errors/validator';
+import { badRequest, notFound, serverError } from '@shared/http';
 
-import {
-  SendForgotPasswordEmailUseCase,
-  SendForgotPasswordEmailController,
-} from '.';
+import { SendVerifyEmailController, SendVerifyEmailUseCase } from '.';
 
 jest.mock('path', () => ({
-  resolve: () => 'any_pash',
+  resolve: () => 'any_path',
   dirname: () => 'any_dirname',
 }));
 
-let sendForgotPasswordEmailUseCase: SendForgotPasswordEmailUseCase;
-let sendForgotPasswordEmailController: SendForgotPasswordEmailController;
+let sendVerifyEmailUseCase: SendVerifyEmailUseCase;
+let sendVeriyEmailController: SendVerifyEmailController;
 let dayjsFacade: DayjsFacade;
 let tokenRepository: TokenRepositoryInMemory;
 let userRepository: UserRepositoryInMemory;
@@ -32,52 +29,31 @@ let emailProvider: EmailProviderInMemory;
 let bodyRequestValidator: BodyRequestValidator;
 let uuidProvider: UuidFacade;
 
-describe('send forgot password email', () => {
+describe('send verify email', () => {
   beforeEach(() => {
-    dayjsFacade = new DayjsFacade();
-    tokenRepository = new TokenRepositoryInMemory();
     emailProvider = new EmailProviderInMemory();
-    userRepository = new UserRepositoryInMemory();
     bodyRequestValidator = new BodyRequestValidator();
     uuidProvider = new UuidFacade();
-    sendForgotPasswordEmailUseCase = new SendForgotPasswordEmailUseCase(
+    userRepository = new UserRepositoryInMemory();
+    tokenRepository = new TokenRepositoryInMemory();
+    dayjsFacade = new DayjsFacade();
+    sendVerifyEmailUseCase = new SendVerifyEmailUseCase(
+      emailProvider,
       userRepository,
       tokenRepository,
       dayjsFacade,
       uuidProvider,
-      emailProvider,
     );
 
-    sendForgotPasswordEmailController = new SendForgotPasswordEmailController(
-      sendForgotPasswordEmailUseCase,
+    sendVeriyEmailController = new SendVerifyEmailController(
+      sendVerifyEmailUseCase,
       bodyRequestValidator,
     );
   });
 
-  it('should sendForgotPasswordEmailController call correctly your methods', async () => {
-    const httpRequest = {
-      body: {
-        email: faker.internet.email(),
-      },
-    };
-
-    const checkSpy = jest.spyOn(bodyRequestValidator, 'check');
-    const executeSpy = jest
-      .spyOn(sendForgotPasswordEmailUseCase, 'execute')
-      .mockResolvedValueOnce(right(true));
-
-    await sendForgotPasswordEmailController.handle(httpRequest);
-
-    expect(checkSpy).toBeCalledWith({
-      body: httpRequest.body,
-      fields: ['email'],
-    });
-
-    expect(executeSpy).toBeCalledWith(httpRequest.body.email);
-  });
-
-  it('should sendForgotPasswordEmailUseCase call correctly your methods', async () => {
+  it('should SendVerifyEmailUseCase call your methods correctly', async () => {
     const email = faker.internet.email();
+    const expires_in = faker.date.future();
 
     userRepository.users.push({
       id: faker.datatype.uuid(),
@@ -89,26 +65,23 @@ describe('send forgot password email', () => {
       isVerified: true,
     });
 
-    const expires_in = faker.date.recent();
-
     const findByEmailSpy = jest.spyOn(userRepository, 'findByEmail');
-    const resolveSpy = jest.spyOn(path, 'resolve').mockReturnValue('any_path');
+    const resoulveSpy = jest.spyOn(path, 'resolve');
     const createSpy = jest
       .spyOn(uuidProvider, 'create')
       .mockResolvedValueOnce('any_token');
-    const addDaysSpy = jest
-      .spyOn(dayjsFacade, 'addDays')
+    const addHoursSpy = jest
+      .spyOn(dayjsFacade, 'addHours')
       .mockReturnValueOnce(expires_in);
     const addSpy = jest.spyOn(tokenRepository, 'add');
-    const sendMailSpy = jest.spyOn(emailProvider, 'sendMail');
+    const sendMail = jest.spyOn(emailProvider, 'sendMail');
 
-    await sendForgotPasswordEmailUseCase.execute(email);
+    await sendVerifyEmailUseCase.execute(email);
 
     expect(findByEmailSpy).toBeCalledWith(email);
-
+    expect(resoulveSpy).toBeCalled();
     expect(createSpy).toBeCalled();
-    expect(addDaysSpy).toBeCalledWith(3);
-    expect(resolveSpy).toBeCalled();
+    expect(addHoursSpy).toBeCalledWith(3);
     expect(addSpy).toBeCalledWith(
       expect.objectContaining({
         token: 'any_token',
@@ -116,9 +89,29 @@ describe('send forgot password email', () => {
       }),
     );
 
-    expect(sendMailSpy).toBeCalled();
+    expect(sendMail).toBeCalled();
   });
-  it('should send a email reset password email for a registred user', async () => {
+
+  it('should sendVeriyEmailController call your methods correctly', async () => {
+    const body_request = {
+      body: {
+        email: faker.internet.email(),
+      },
+    };
+
+    const checkSpy = jest.spyOn(bodyRequestValidator, 'check');
+    const executeSpy = jest.spyOn(sendVerifyEmailUseCase, 'execute');
+
+    await sendVeriyEmailController.handle(body_request);
+
+    expect(checkSpy).toBeCalledWith({
+      body: body_request.body,
+      fields: ['email'],
+    });
+
+    expect(executeSpy).toBeCalledWith(body_request.body.email);
+  });
+  it('should send a verify email if the user is registered ', async () => {
     const email = faker.internet.email();
 
     userRepository.users.push({
@@ -131,47 +124,47 @@ describe('send forgot password email', () => {
       isVerified: true,
     });
 
-    const httpRequest = {
+    const body_request = {
       body: {
         email,
       },
     };
 
-    const httpResponse = await sendForgotPasswordEmailController.handle(
-      httpRequest,
-    );
+    const httpResponse = await sendVeriyEmailController.handle(body_request);
 
     expect(httpResponse.statusCode).toBe(200);
   });
 
-  it('should returns a not found status if the email is not registred', async () => {
-    const httpRequest = {
+  it('should returns a not found status if the email is no registred', async () => {
+    const body_request = {
       body: {
         email: faker.internet.email(),
       },
     };
 
-    const httpResponse = await sendForgotPasswordEmailController.handle(
-      httpRequest,
-    );
+    const httpResponse = await sendVeriyEmailController.handle(body_request);
 
     expect(httpResponse).toEqual(notFound(new UserNotFoundError()));
   });
 
-  it('should returns a server error status if sendForgotPasswordEmailUseCase.execute() throws a error', async () => {
-    const httpRequest = {
+  it('should return an bad request status if the email field in the request body is missing', async () => {
+    const httpResponse = await sendVeriyEmailController.handle({ body: {} });
+
+    expect(httpResponse).toEqual(badRequest(new EmptyBodyError()));
+  });
+
+  it('should return a sever error status if sendForgotPasswordEmailUseCase.execute() throws an error', async () => {
+    const body_request = {
       body: {
         email: faker.internet.email(),
       },
     };
 
     jest
-      .spyOn(sendForgotPasswordEmailUseCase, 'execute')
+      .spyOn(sendVerifyEmailUseCase, 'execute')
       .mockRejectedValueOnce(new Error());
 
-    const httpResponse = await sendForgotPasswordEmailController.handle(
-      httpRequest,
-    );
+    const httpResponse = await sendVeriyEmailController.handle(body_request);
 
     expect(httpResponse).toEqual(serverError());
   });

@@ -5,9 +5,8 @@ import {
   ITokenRepository,
 } from '@modules/accounts/repositories';
 import { IDateProvider } from '@shared/container/providers';
+import { InvalidTokenError } from '@shared/errors/useCase';
 import { Either, left, right } from '@shared/utils';
-
-import { InvalidTokenError } from '../reset-password-user/errors';
 
 @injectable()
 export class VerifyEmailUseCase {

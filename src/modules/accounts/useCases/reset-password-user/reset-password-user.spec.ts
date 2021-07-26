@@ -41,6 +41,91 @@ describe('Reset password user', () => {
     );
   });
 
+  it('should resetPasswordUserUseCase call your methods correctly ', async () => {
+    const token = faker.datatype.uuid();
+    const id_user = faker.datatype.uuid();
+    const id_token = faker.datatype.uuid();
+    const password = faker.internet.password();
+    const expires_in = faker.date.future();
+    const recent_date = faker.date.recent();
+    const user = {} as any;
+
+    tokenRepository.refreshTokens.push({
+      id: id_token,
+      id_user,
+      expires_in,
+      token,
+      created_at: faker.date.recent(),
+      user,
+    });
+    userRepository.users.push({
+      id: id_user,
+      avatar_url: 'any_url',
+      created_at: faker.date.soon(),
+      email: faker.internet.email(),
+      name: faker.internet.userName(),
+      password: faker.internet.password(),
+      isVerified: true,
+    });
+
+    const findBytokenSpy = jest.spyOn(tokenRepository, 'findByToken');
+    const compareIfBeforeSpy = jest.spyOn(dayjsFacade, 'compareIfBefore');
+    const dateNowSpy = jest
+      .spyOn(dayjsFacade, 'dateNow')
+      .mockReturnValue(recent_date);
+    const findByIdSpy = jest.spyOn(userRepository, 'findById');
+    const hashSpy = jest
+      .spyOn(bcryptFacade, 'hash')
+      .mockResolvedValueOnce('any_hash');
+    const addSpy = jest.spyOn(userRepository, 'add');
+    const deleteByIdSpy = jest.spyOn(tokenRepository, 'deleteById');
+
+    await resetPasswordUserUseCase.execute({
+      token,
+      password,
+    });
+
+    expect(findBytokenSpy).toBeCalledWith(token);
+    expect(dateNowSpy).toBeCalled();
+    expect(compareIfBeforeSpy).toBeCalledWith(expires_in, recent_date);
+    expect(findByIdSpy).toBeCalledWith(id_user);
+    expect(hashSpy).toBeCalledWith(password);
+    expect(addSpy).toBeCalledWith(
+      expect.objectContaining({
+        password: 'any_hash',
+      }),
+    );
+    expect(deleteByIdSpy).toBeCalledWith(id_token);
+  });
+
+  it('should resetPasswordUserController call your methods correctly', async () => {
+    const password = faker.internet.password();
+    const token = faker.datatype.uuid();
+    const request_body = {
+      body: {
+        password,
+      },
+      query: {
+        token,
+      },
+    };
+
+    const checkSpy = jest.spyOn(bodyRequestValidator, 'check');
+    const executeSpy = jest.spyOn(resetPasswordUserUseCase, 'execute');
+
+    await resetPasswordUserController.handle(request_body);
+
+    expect(checkSpy).toBeCalledWith({
+      body: request_body.body,
+      fields: ['password'],
+    });
+
+    expect(executeSpy).toBeCalledWith({
+      token,
+      password,
+    });
+  });
+
   it('should reset a password user if the reset password token is valid', async () => {
     const token = faker.datatype.uuid();
     const id_user = faker.datatype.uuid();
@@ -141,82 +226,5 @@ describe('Reset password user', () => {
     const httpResponse = await resetPasswordUserController.handle(request_body);
 
     expect(httpResponse).toEqual(serverError());
-  });
-
-  it('should resetPasswordUserUseCase call your methods correctly ', async () => {
-    const token = faker.datatype.uuid();
-    const id_user = faker.datatype.uuid();
-    const password = faker.internet.password();
-    const expires_in = faker.date.future();
-    const recent_date = faker.date.recent();
-
-    await tokenRepository.add({
-      token,
-      expires_in,
-      id_user,
-    });
-
-    userRepository.users.push({
-      id: id_user,
-      avatar_url: 'any_url',
-      created_at: faker.date.soon(),
-      email: faker.internet.email(),
-      name: faker.internet.userName(),
-      password: faker.internet.password(),
-      isVerified: true,
-    });
-
-    const findBytokenSpy = jest.spyOn(tokenRepository, 'findByToken');
-    const compareIfBeforeSpy = jest.spyOn(dayjsFacade, 'compareIfBefore');
-    const dateNowSpy = jest
-      .spyOn(dayjsFacade, 'dateNow')
-      .mockReturnValue(recent_date);
-    const findByIdSpy = jest.spyOn(userRepository, 'findById');
-    const hashSpy = jest.spyOn(bcryptFacade, 'hash').mockResolvedValueOnce('any_hash');
-    const addSpy = jest.spyOn(userRepository, 'add');
-    const deleteByIdSpy = jest.spyOn(tokenRepository, 'deleteById');
-
-    await resetPasswordUserUseCase.execute({
-      token,
-      password,
-    });
-
-    expect(findBytokenSpy).toBeCalledWith(token);
-    expect(dateNowSpy).toBeCalled();
-    expect(compareIfBeforeSpy).toBeCalledWith(expires_in, recent_date);
-    expect(findByIdSpy).toBeCalledWith(id_user);
-    expect(hashSpy).toBeCalledWith(password);
-    expect(addSpy).toBeCalledWith(expect.objectContaining({
-      password: 'any_hash',
-    }));
-    expect(deleteByIdSpy).toBeCalled();
-  });
-
-  it('should resetPasswordUserController call your methods correctly', async () => {
-    const password = faker.internet.password();
-    const token = faker.datatype.uuid();
-    const request_body = {
-      body: {
-        password,
-      },
-      query: {
-        token,
-      },
-    };
-
-    const checkSpy = jest.spyOn(bodyRequestValidator, 'check');
-    const executeSpy = jest.spyOn(resetPasswordUserUseCase, 'execute');
-
-    await resetPasswordUserController.handle(request_body);
-
-    expect(checkSpy).toBeCalledWith({
-      body: request_body.body,
-      fields: ['password'],
-    });
-
-    expect(executeSpy).toBeCalledWith({
-      token,
-      password,
-    });
   });
 });

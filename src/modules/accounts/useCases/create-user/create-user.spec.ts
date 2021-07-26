@@ -51,6 +51,43 @@ describe('create user', () => {
     );
   });
 
+  it('should CreaUserUserCase call your methods correctly', async () => {
+    const user_mock = {
+      email: faker.internet.email(),
+      name: faker.internet.userName(),
+      password: faker.internet.password(),
+    };
+
+    const checkSpy = jest.spyOn(userParamsValidator, 'check');
+    const findByEmail = jest.spyOn(userRepository, 'findByEmail');
+    const hashSpy = jest
+      .spyOn(bcryptFacade, 'hash')
+      .mockResolvedValueOnce('any_hash');
+    const addSpy = jest.spyOn(userRepository, 'add');
+
+    await createUserUseCase.execute(user_mock);
+
+    expect(checkSpy).toBeCalledWith(user_mock);
+    expect(findByEmail).toBeCalledWith(user_mock.email);
+    expect(hashSpy).toBeCalledWith(user_mock.password);
+    expect(addSpy).toBeCalledWith({
+      ...user_mock,
+      password: 'any_hash',
+    });
+  });
+
+  it('should createUserController call your methods correctly', async () => {
+    const checkSpy = jest.spyOn(bodyRequestValidator, 'check');
+    const executeSpy = jest.spyOn(createUserUseCase, 'execute');
+    await createUserController.handle(httpRequest);
+
+    expect(checkSpy).toBeCalledWith({
+      body: httpRequest.body,
+      fields: ['name', 'email', 'password'],
+    });
+
+    expect(executeSpy).toBeCalledWith(httpRequest.body);
+  });
   it('should create a new user', async () => {
     const httpResponse = await createUserController.handle(httpRequest);
 
@@ -119,43 +156,5 @@ describe('create user', () => {
     const httpResponse = await createUserController.handle(httpRequest);
 
     expect(httpResponse).toEqual(serverError());
-  });
-
-  it('should CreaUserUserCase call your methods correctly', async () => {
-    const user_mock = {
-      email: faker.internet.email(),
-      name: faker.internet.userName(),
-      password: faker.internet.password(),
-    };
-
-    const checkSpy = jest.spyOn(userParamsValidator, 'check');
-    const findByEmail = jest.spyOn(userRepository, 'findByEmail');
-    const hashSpy = jest
-      .spyOn(bcryptFacade, 'hash')
-      .mockResolvedValueOnce('any_hash');
-    const addSpy = jest.spyOn(userRepository, 'add');
-
-    await createUserUseCase.execute(user_mock);
-
-    expect(checkSpy).toBeCalledWith(user_mock);
-    expect(findByEmail).toBeCalledWith(user_mock.email);
-    expect(hashSpy).toBeCalledWith(user_mock.password);
-    expect(addSpy).toBeCalledWith({
-      ...user_mock,
-      password: 'any_hash',
-    });
-  });
-
-  it('should createUserController call your methods correctly', async () => {
-    const checkSpy = jest.spyOn(bodyRequestValidator, 'check');
-    const executeSpy = jest.spyOn(createUserUseCase, 'execute');
-    await createUserController.handle(httpRequest);
-
-    expect(checkSpy).toBeCalledWith({
-      body: httpRequest.body,
-      fields: ['name', 'email', 'password'],
-    });
-
-    expect(executeSpy).toBeCalledWith(httpRequest.body);
   });
 });
