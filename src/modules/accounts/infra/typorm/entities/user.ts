@@ -1,5 +1,9 @@
 import {
-  Entity, Column, CreateDateColumn, PrimaryColumn,
+  Entity,
+  Column,
+  CreateDateColumn,
+  PrimaryColumn,
+  UpdateDateColumn,
 } from 'typeorm';
 import { v4 as uuidV4 } from 'uuid';
 
@@ -25,6 +29,9 @@ class User {
 
   @CreateDateColumn()
   created_at: Date;
+
+  @UpdateDateColumn()
+  updated_at: Date;
 
   constructor() {
     if (!this.id) {

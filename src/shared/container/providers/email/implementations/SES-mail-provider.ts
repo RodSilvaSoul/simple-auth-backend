@@ -36,9 +36,9 @@ export class SESMailProvider implements IMailProvider {
   ): Promise<void> {
     const templateFileContent = fs.readFileSync(path).toString('utf-8');
 
-    const templatePaser = handlebars.compile(templateFileContent);
+    const templateParser = handlebars.compile(templateFileContent);
 
-    const templateHTML = templatePaser(variables);
+    const templateHTML = templateParser(variables);
 
     await this.client.sendMail({
       to,

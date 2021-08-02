@@ -21,7 +21,7 @@ jest.mock('path', () => ({
 }));
 
 let sendVerifyEmailUseCase: SendVerifyEmailUseCase;
-let sendVeriyEmailController: SendVerifyEmailController;
+let sendVerifyEmailController: SendVerifyEmailController;
 let dayjsFacade: DayjsFacade;
 let tokenRepository: TokenRepositoryInMemory;
 let userRepository: UserRepositoryInMemory;
@@ -45,7 +45,7 @@ describe('send verify email', () => {
       uuidProvider,
     );
 
-    sendVeriyEmailController = new SendVerifyEmailController(
+    sendVerifyEmailController = new SendVerifyEmailController(
       sendVerifyEmailUseCase,
       bodyRequestValidator,
     );
@@ -66,7 +66,7 @@ describe('send verify email', () => {
     });
 
     const findByEmailSpy = jest.spyOn(userRepository, 'findByEmail');
-    const resoulveSpy = jest.spyOn(path, 'resolve');
+    const resolveSpy = jest.spyOn(path, 'resolve');
     const createSpy = jest
       .spyOn(uuidProvider, 'create')
       .mockResolvedValueOnce('any_token');
@@ -79,7 +79,7 @@ describe('send verify email', () => {
     await sendVerifyEmailUseCase.execute(email);
 
     expect(findByEmailSpy).toBeCalledWith(email);
-    expect(resoulveSpy).toBeCalled();
+    expect(resolveSpy).toBeCalled();
     expect(createSpy).toBeCalled();
     expect(addHoursSpy).toBeCalledWith(3);
     expect(addSpy).toBeCalledWith(
@@ -102,7 +102,7 @@ describe('send verify email', () => {
     const checkSpy = jest.spyOn(bodyRequestValidator, 'check');
     const executeSpy = jest.spyOn(sendVerifyEmailUseCase, 'execute');
 
-    await sendVeriyEmailController.handle(body_request);
+    await sendVerifyEmailController.handle(body_request);
 
     expect(checkSpy).toBeCalledWith({
       body: body_request.body,
@@ -130,25 +130,25 @@ describe('send verify email', () => {
       },
     };
 
-    const httpResponse = await sendVeriyEmailController.handle(body_request);
+    const httpResponse = await sendVerifyEmailController.handle(body_request);
 
     expect(httpResponse.statusCode).toBe(200);
   });
 
-  it('should returns a not found status if the email is no registred', async () => {
+  it('should returns a not found status if the email is no registered', async () => {
     const body_request = {
       body: {
         email: faker.internet.email(),
       },
     };
 
-    const httpResponse = await sendVeriyEmailController.handle(body_request);
+    const httpResponse = await sendVerifyEmailController.handle(body_request);
 
     expect(httpResponse).toEqual(notFound(new UserNotFoundError()));
   });
 
   it('should return an bad request status if the email field in the request body is missing', async () => {
-    const httpResponse = await sendVeriyEmailController.handle({ body: {} });
+    const httpResponse = await sendVerifyEmailController.handle({ body: {} });
 
     expect(httpResponse).toEqual(badRequest(new EmptyBodyError()));
   });
@@ -164,7 +164,7 @@ describe('send verify email', () => {
       .spyOn(sendVerifyEmailUseCase, 'execute')
       .mockRejectedValueOnce(new Error());
 
-    const httpResponse = await sendVeriyEmailController.handle(body_request);
+    const httpResponse = await sendVerifyEmailController.handle(body_request);
 
     expect(httpResponse).toEqual(serverError());
   });
