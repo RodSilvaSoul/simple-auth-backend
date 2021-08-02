@@ -83,6 +83,7 @@ describe('send forgot password email', () => {
       id: faker.datatype.uuid(),
       avatar_url: 'any_url',
       created_at: faker.date.soon(),
+      updated_at: faker.date.soon(),
       email,
       name: faker.internet.userName(),
       password: faker.internet.password(),
@@ -118,7 +119,7 @@ describe('send forgot password email', () => {
 
     expect(sendMailSpy).toBeCalled();
   });
-  it('should send a email reset password email for a registred user', async () => {
+  it('should send a email reset password email for a registered user', async () => {
     const email = faker.internet.email();
 
     userRepository.users.push({
@@ -127,6 +128,7 @@ describe('send forgot password email', () => {
       created_at: faker.date.soon(),
       email,
       name: faker.internet.userName(),
+      updated_at: faker.date.soon(),
       password: faker.internet.password(),
       isVerified: true,
     });
@@ -144,7 +146,7 @@ describe('send forgot password email', () => {
     expect(httpResponse.statusCode).toBe(200);
   });
 
-  it('should returns a not found status if the email is not registred', async () => {
+  it('should returns a not found status if the email is not registered', async () => {
     const httpRequest = {
       body: {
         email: faker.internet.email(),

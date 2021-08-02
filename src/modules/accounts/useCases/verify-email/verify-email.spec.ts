@@ -49,13 +49,14 @@ describe('verify email ', () => {
       id: id_user,
       avatar_url: 'any_url',
       created_at: faker.date.soon(),
+      updated_at: faker.date.soon(),
       email: faker.internet.email(),
       name: faker.internet.userName(),
       password: faker.internet.password(),
       isVerified: false,
     });
 
-    const findBytokenSpy = jest.spyOn(tokenRepository, 'findByToken');
+    const findByTokenSpy = jest.spyOn(tokenRepository, 'findByToken');
     const compareIfBeforeSpy = jest.spyOn(dayjsFacade, 'compareIfBefore');
     const dateNowSpy = jest
       .spyOn(dayjsFacade, 'dateNow')
@@ -66,7 +67,7 @@ describe('verify email ', () => {
 
     await verifyEmailUseCase.execute(token);
 
-    expect(findBytokenSpy).toBeCalledWith(token);
+    expect(findByTokenSpy).toBeCalledWith(token);
     expect(dateNowSpy).toBeCalled();
     expect(compareIfBeforeSpy).toBeCalledWith(expires_in, recent_date);
     expect(findByIdSpy).toBeCalledWith(id_user);
@@ -94,7 +95,7 @@ describe('verify email ', () => {
     expect(executeSpy).toBeCalledWith(token);
   });
 
-  it('should verify a email of a registred user', async () => {
+  it('should verify a email of a registered user', async () => {
     const token = faker.datatype.uuid();
 
     await tokenRepository.add({
@@ -107,6 +108,7 @@ describe('verify email ', () => {
       id: faker.datatype.uuid(),
       avatar_url: 'any_url',
       created_at: faker.date.soon(),
+      updated_at: faker.date.soon(),
       email: faker.internet.email(),
       name: faker.internet.userName(),
       password: faker.internet.password(),
@@ -124,13 +126,13 @@ describe('verify email ', () => {
     expect(httpResponse.statusCode).toBe(200);
   });
 
-  it('shoud not accpet a request missing the token in the query', async () => {
+  it('should not accept a request missing the token in the query', async () => {
     const httpResponse = await verifyEmailController.handle({ query: {} });
 
     expect(httpResponse).toEqual(unauthorized(new InvalidTokenError()));
   });
 
-  it('should not accpet a invalid token', async () => {
+  it('should not accept a invalid token', async () => {
     const request = {
       query: {
         token: faker.datatype.uuid(),
@@ -142,7 +144,7 @@ describe('verify email ', () => {
     expect(httpResponse).toEqual(unauthorized(new InvalidTokenError()));
   });
 
-  it('should not accpet a expired token', async () => {
+  it('should not accept a expired token', async () => {
     const token = faker.datatype.uuid();
 
     await tokenRepository.add({

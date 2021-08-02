@@ -59,6 +59,7 @@ describe('send verify email', () => {
       id: faker.datatype.uuid(),
       avatar_url: 'any_url',
       created_at: faker.date.soon(),
+      updated_at: faker.date.soon(),
       email,
       name: faker.internet.userName(),
       password: faker.internet.password(),
@@ -92,7 +93,7 @@ describe('send verify email', () => {
     expect(sendMail).toBeCalled();
   });
 
-  it('should sendVeriyEmailController call your methods correctly', async () => {
+  it('should sendVerifyEmailController call your methods correctly', async () => {
     const body_request = {
       body: {
         email: faker.internet.email(),
@@ -118,6 +119,7 @@ describe('send verify email', () => {
       id: faker.datatype.uuid(),
       avatar_url: 'any_url',
       created_at: faker.date.soon(),
+      updated_at: faker.date.soon(),
       email,
       name: faker.internet.userName(),
       password: faker.internet.password(),

@@ -6,7 +6,7 @@ import { BcryptFacade } from '@shared/container/providers/hasher/implementations
 import {
   UserParamsValidator,
   BodyRequestValidator,
-  USER_PARANS_VALIDATOR_ERRORS,
+  USER_PARAMS_VALIDATOR_ERRORS,
 } from '@shared/container/providers/validator/implementations';
 import {
   EmptyBodyError,
@@ -15,12 +15,12 @@ import {
 } from '@shared/errors/validator';
 import { badRequest, serverError } from '@shared/http';
 
-import { CreaUserUserCase, CreateUserController } from '.';
+import { CreatUserUserCase, CreateUserController } from '.';
 
 let bcryptFacade: BcryptFacade;
 let userParamsValidator: UserParamsValidator;
 let userRepository: UserRepositoryInMemory;
-let createUserUseCase: CreaUserUserCase;
+let createUserUseCase: CreatUserUserCase;
 let bodyRequestValidator: BodyRequestValidator;
 let createUserController: CreateUserController;
 let httpRequest: {
@@ -40,7 +40,7 @@ describe('create user', () => {
     userParamsValidator = new UserParamsValidator();
     userRepository = new UserRepositoryInMemory();
     bodyRequestValidator = new BodyRequestValidator();
-    createUserUseCase = new CreaUserUserCase(
+    createUserUseCase = new CreatUserUserCase(
       userRepository,
       userParamsValidator,
       bcryptFacade,
@@ -51,7 +51,7 @@ describe('create user', () => {
     );
   });
 
-  it('should CreaUserUserCase call your methods correctly', async () => {
+  it('should CreatUserUserCase call your methods correctly', async () => {
     const user_mock = {
       email: faker.internet.email(),
       name: faker.internet.userName(),
@@ -105,14 +105,14 @@ describe('create user', () => {
     expect(httpResponse).toEqual(badRequest(new EmptyBodyError()));
   });
 
-  it('should not accpet a body request missing a requerid field', async () => {
+  it('should not accept a body request missing a required field', async () => {
     delete httpRequest.body.password;
     const httpResponse = await createUserController.handle(httpRequest);
 
     expect(httpResponse).toEqual(badRequest(new MissingParamError('password')));
   });
 
-  it('should not accpet a invalid email address', async () => {
+  it('should not accept a invalid email address', async () => {
     const httpResponse = await createUserController.handle({
       body: {
         ...httpRequest.body,
@@ -121,11 +121,11 @@ describe('create user', () => {
     });
 
     expect(httpResponse).toEqual(
-      badRequest(new InvalidParamError(USER_PARANS_VALIDATOR_ERRORS.email)),
+      badRequest(new InvalidParamError(USER_PARAMS_VALIDATOR_ERRORS.email)),
     );
   });
 
-  it('should not accpet a invalid name', async () => {
+  it('should not accept a invalid name', async () => {
     const httpResponse = await createUserController.handle({
       body: {
         ...httpRequest.body,
@@ -133,11 +133,11 @@ describe('create user', () => {
       },
     });
     expect(httpResponse).toEqual(
-      badRequest(new InvalidParamError(USER_PARANS_VALIDATOR_ERRORS.name)),
+      badRequest(new InvalidParamError(USER_PARAMS_VALIDATOR_ERRORS.name)),
     );
   });
 
-  it('should not accpet a invalid password', async () => {
+  it('should not accept a invalid password', async () => {
     const httpResponse = await createUserController.handle({
       body: {
         ...httpRequest.body,
@@ -146,7 +146,7 @@ describe('create user', () => {
     });
 
     expect(httpResponse).toEqual(
-      badRequest(new InvalidParamError(USER_PARANS_VALIDATOR_ERRORS.password)),
+      badRequest(new InvalidParamError(USER_PARAMS_VALIDATOR_ERRORS.password)),
     );
   });
 

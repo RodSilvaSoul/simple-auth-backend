@@ -62,13 +62,14 @@ describe('Reset password user', () => {
       id: id_user,
       avatar_url: 'any_url',
       created_at: faker.date.soon(),
+      updated_at: faker.date.soon(),
       email: faker.internet.email(),
       name: faker.internet.userName(),
       password: faker.internet.password(),
       isVerified: true,
     });
 
-    const findBytokenSpy = jest.spyOn(tokenRepository, 'findByToken');
+    const findByTokenSpy = jest.spyOn(tokenRepository, 'findByToken');
     const compareIfBeforeSpy = jest.spyOn(dayjsFacade, 'compareIfBefore');
     const dateNowSpy = jest
       .spyOn(dayjsFacade, 'dateNow')
@@ -85,7 +86,7 @@ describe('Reset password user', () => {
       password,
     });
 
-    expect(findBytokenSpy).toBeCalledWith(token);
+    expect(findByTokenSpy).toBeCalledWith(token);
     expect(dateNowSpy).toBeCalled();
     expect(compareIfBeforeSpy).toBeCalledWith(expires_in, recent_date);
     expect(findByIdSpy).toBeCalledWith(id_user);
@@ -142,6 +143,7 @@ describe('Reset password user', () => {
       id: id_user,
       avatar_url: 'any_url',
       created_at: faker.date.soon(),
+      updated_at: faker.date.soon(),
       email: faker.internet.email(),
       name: faker.internet.userName(),
       password: old_password,

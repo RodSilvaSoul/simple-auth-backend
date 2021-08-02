@@ -7,6 +7,7 @@ import {
   PrimaryColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { v4 as uuidV4 } from 'uuid';
 
 import { User } from './user';
 
@@ -31,6 +32,9 @@ export class UserAddress {
   city: string;
 
   @Column()
+  house_number: number;
+
+  @Column()
   postal_code: string;
 
   @CreateDateColumn()
@@ -38,4 +42,10 @@ export class UserAddress {
 
   @UpdateDateColumn()
   updated_at: Date;
+
+  constructor() {
+    if (!this.id) {
+      this.id = uuidV4();
+    }
+  }
 }

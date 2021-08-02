@@ -6,10 +6,10 @@ import { Either, left, right } from '@shared/utils';
 
 import { CreateUserDTO } from '../../dtos';
 import { IUserRepository } from '../../repositories';
-import { EmailAlredyUseError } from './erros';
+import { EmailAlreadyUseError } from './errors';
 
 @injectable()
-class CreaUserUserCase {
+class CreatUserUserCase {
   constructor(
     @inject('UserRepository')
     private readonly userRepository: IUserRepository,
@@ -23,21 +23,21 @@ class CreaUserUserCase {
     email,
     name,
     password,
-  }: CreateUserDTO): Promise<Either<EmailAlredyUseError, true>> {
-    const haveAparamInvalid = this.userParamsValidator.check({
+  }: CreateUserDTO): Promise<Either<EmailAlreadyUseError, true>> {
+    const haveAInvalidParam = this.userParamsValidator.check({
       email,
       name,
       password,
     });
 
-    const emailAlredyUse = await this.userRepository.findByEmail(email);
+    const emailAlreadyUse = await this.userRepository.findByEmail(email);
 
-    if (haveAparamInvalid.isLeft()) {
-      return left(haveAparamInvalid.value);
+    if (haveAInvalidParam.isLeft()) {
+      return left(haveAInvalidParam.value);
     }
 
-    if (emailAlredyUse.isRight()) {
-      return left(new EmailAlredyUseError(email));
+    if (emailAlreadyUse.isRight()) {
+      return left(new EmailAlreadyUseError(email));
     }
 
     const passwordHash = await this.hasherProvider.hash(password);
@@ -52,4 +52,4 @@ class CreaUserUserCase {
   }
 }
 
-export { CreaUserUserCase };
+export { CreatUserUserCase };

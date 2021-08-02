@@ -1,3 +1,3 @@
 export * from './body-request-validator';
-export * from './user-params-valiador';
-export * from './erros';
+export * from './user-params-validator';
+export * from './errors';
