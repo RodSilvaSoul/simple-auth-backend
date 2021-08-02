@@ -4,18 +4,24 @@ import './providers';
 import {
   TokenRepository,
   UserRepository,
+  UserAddressRepository,
+  UserPhoneRepository,
 } from '@modules/accounts/infra/typorm/repositories';
 import {
   ITokenRepository,
   IUserRepository,
+  IUserAddressRepository,
+  IUserPhoneRepository,
 } from '@modules/accounts/repositories';
 import {
   UserAuthenticateUseCase,
-  CreaUserUserCase,
+  CreatUserUserCase,
   ResetPasswordUserUseCase,
   SendForgotPasswordEmailUseCase,
   SendVerifyEmailUseCase,
   VerifyEmailUseCase,
+  CreateOrUpdateUserAddressUseCase,
+  CreateOrUpdateUserPhoneUseCase,
 } from '@modules/accounts/useCases';
 
 container.registerSingleton<ITokenRepository>(
@@ -25,14 +31,24 @@ container.registerSingleton<ITokenRepository>(
 
 container.registerSingleton<IUserRepository>('UserRepository', UserRepository);
 
+container.registerSingleton<IUserAddressRepository>(
+  'UserAddressRepository',
+  UserAddressRepository,
+);
+
+container.registerSingleton<IUserPhoneRepository>(
+  UserPhoneRepository,
+  'UserPhoneRepository',
+);
+
 container.registerSingleton<UserAuthenticateUseCase>(
   'UserAuthenticateUseCase',
   UserAuthenticateUseCase,
 );
 
-container.registerSingleton<CreaUserUserCase>(
-  'CreaUserUserCase',
-  CreaUserUserCase,
+container.registerSingleton<CreatUserUserCase>(
+  'CreatUserUserCase',
+  CreatUserUserCase,
 );
 
 container.registerSingleton<ResetPasswordUserUseCase>(
@@ -53,4 +69,14 @@ container.registerSingleton<SendVerifyEmailUseCase>(
 container.registerSingleton<VerifyEmailUseCase>(
   'VerifyEmailUseCase',
   VerifyEmailUseCase,
+);
+
+container.registerSingleton<CreateOrUpdateUserAddressUseCase>(
+  CreateOrUpdateUserAddressUseCase,
+  'CreateOrUpdateUserAddressUseCase',
+);
+
+container.registerSingleton<CreateOrUpdateUserPhoneUseCase>(
+  CreateOrUpdateUserPhoneUseCase,
+  'CreateOrUpdateUserPhoneUseCase',
 );
