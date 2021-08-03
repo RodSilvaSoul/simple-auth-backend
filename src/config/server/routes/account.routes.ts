@@ -8,7 +8,7 @@ import {
   SendForgotPasswordEmailController,
   VerifyEmailController,
   SendVerifyEmailController,
-  CreateOrUpdateUserAddressController,
+  CreateUserAddressController,
   CreateOrUpdateUserPhoneController,
 } from '@modules/accounts/useCases';
 import {
@@ -32,8 +32,8 @@ const resetPasswordUserController = container.resolve(
 const verifyEmailController = container.resolve(VerifyEmailController);
 const sendVerifyEmailController = container.resolve(SendVerifyEmailController);
 
-const createOrUpdateUserAddressController = container.resolve(
-  CreateOrUpdateUserAddressController,
+const createUserAddressController = container.resolve(
+  CreateUserAddressController,
 );
 
 const createOrUpdateUserPhoneController = container.resolve(
@@ -75,7 +75,7 @@ export default (router: Router) => {
   router.post(
     '/user/address',
     expressAuthMiddleware,
-    expressRouterAdapter(createOrUpdateUserAddressController),
+    expressRouterAdapter(createUserAddressController),
   );
 
   router.post(

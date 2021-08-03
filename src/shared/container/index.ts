@@ -21,7 +21,7 @@ import {
   SendForgotPasswordEmailUseCase,
   SendVerifyEmailUseCase,
   VerifyEmailUseCase,
-  CreateOrUpdateUserAddressUseCase,
+  CreateUserAddressUseCase,
   CreateOrUpdateUserPhoneUseCase,
 } from '@modules/accounts/useCases';
 import { IMiddleware } from '@shared/ports/middleware';
@@ -45,9 +45,9 @@ container.registerSingleton<IUserPhoneRepository>(
   UserPhoneRepository,
 );
 
-container.registerSingleton<CreateOrUpdateUserAddressUseCase>(
-  'CreateOrUpdateUserAddressUseCase',
-  CreateOrUpdateUserAddressUseCase,
+container.registerSingleton<CreateUserAddressUseCase>(
+  'CreateUserAddressUseCase',
+  CreateUserAddressUseCase,
 );
 
 container.registerSingleton<CreateOrUpdateUserPhoneUseCase>(

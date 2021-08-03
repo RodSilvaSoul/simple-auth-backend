@@ -1,2 +1,2 @@
-export * from './create-or-update-user-address-controller';
-export * from './create-or-update-user-address-useCase';
+export * from './create-user-address-controller';
+export * from './create-user-address-useCase';

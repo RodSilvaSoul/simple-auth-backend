@@ -12,8 +12,8 @@ import { EmptyBodyError } from '@shared/errors/validator';
 import { badRequest } from '@shared/http';
 import { right } from '@shared/utils';
 
-import { CreateOrUpdateUserAddressController } from './create-or-update-user-address-controller';
-import { CreateOrUpdateUserAddressUseCase } from './create-or-update-user-address-useCase';
+import { CreateOrUpdateUserAddressController } from './create-user-address-controller';
+import { CreateOrUpdateUserAddressUseCase } from './create-user-address-useCase';
 
 let createOrUpdateUserAddressUseCase: CreateOrUpdateUserAddressUseCase;
 let createOrUpdateUserAddressController: CreateOrUpdateUserAddressController;

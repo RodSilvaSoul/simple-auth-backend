@@ -12,13 +12,13 @@ import {
 } from '@shared/http';
 import { IController } from '@shared/ports';
 
-import { CreateOrUpdateUserAddressUseCase } from './create-or-update-user-address-useCase';
+import { CreateUserAddressUseCase } from './create-user-address-useCase';
 
 @singleton()
-class CreateOrUpdateUserAddressController implements IController {
+export class CreateUserAddressController implements IController {
   constructor(
-    @inject('CreateOrUpdateUserAddressUseCase')
-    private readonly createOrUpdateUserAddressUseCase: CreateOrUpdateUserAddressUseCase,
+    @inject('CreateUserAddressUseCase')
+    private readonly createUserAddressUseCase: CreateUserAddressUseCase,
     @inject('BodyRequestValidator')
     private readonly bodyRequestValidator: IValidator<BodyRequestValidatorParams>,
   ) {}
@@ -38,7 +38,7 @@ class CreateOrUpdateUserAddressController implements IController {
         city, district, house_number, id_user, postal_code, state,
       } = body as CreateUserAddressDTO;
 
-      const result = await this.createOrUpdateUserAddressUseCase.execute({
+      const result = await this.createUserAddressUseCase.execute({
         city,
         district,
         state,
@@ -57,5 +57,3 @@ class CreateOrUpdateUserAddressController implements IController {
     }
   }
 }
-
-export { CreateOrUpdateUserAddressController };
