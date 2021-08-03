@@ -1,6 +1,6 @@
 export class EmptyBodyError extends Error {
   constructor() {
-    super('The body requesition is empty');
+    super('The body requisition is empty');
     this.name = 'EmptyBodyError';
   }
 }

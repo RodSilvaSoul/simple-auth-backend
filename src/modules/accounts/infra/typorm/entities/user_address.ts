@@ -23,7 +23,7 @@ export class UserAddress {
   user: User;
 
   @Column()
-  country: string;
+  state: string;
 
   @Column()
   district: string;

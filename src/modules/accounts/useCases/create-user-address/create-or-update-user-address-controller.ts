@@ -1,6 +1,6 @@
 import { inject, singleton } from 'tsyringe';
 
-import { CreateOrUpdateUserAddressDTO } from '@modules/accounts/dtos';
+import { CreateUserAddressDTO } from '@modules/accounts/dtos';
 import { IValidator } from '@shared/container/providers';
 import { BodyRequestValidatorParams } from '@shared/container/providers/validator/implementations';
 import {
@@ -27,7 +27,7 @@ class CreateOrUpdateUserAddressController implements IController {
     try {
       const haveBodyInvalidParams = this.bodyRequestValidator.check({
         body,
-        fields: [],
+        fields: ['city', 'state', 'house_number', 'id_user', 'postal_code'],
       });
 
       if (haveBodyInvalidParams.isLeft()) {
@@ -35,12 +35,13 @@ class CreateOrUpdateUserAddressController implements IController {
       }
 
       const {
-        city, district, house_number, id_user, postal_code,
-      } = body as CreateOrUpdateUserAddressDTO;
+        city, district, house_number, id_user, postal_code, state,
+      } = body as CreateUserAddressDTO;
 
       const result = await this.createOrUpdateUserAddressUseCase.execute({
         city,
         district,
+        state,
         house_number,
         id_user,
         postal_code,
@@ -51,7 +52,7 @@ class CreateOrUpdateUserAddressController implements IController {
       }
 
       return ok(result.value);
-    } catch {
+    } catch (error) {
       return serverError();
     }
   }

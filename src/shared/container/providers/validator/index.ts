@@ -1,7 +1,10 @@
 import { container } from 'tsyringe';
 
-import { BodyRequestValidator } from './implementations/body-request-validator';
-import { UserParamsValidator } from './implementations/user-params-validator';
+import {
+  BodyRequestValidator,
+  UserParamsValidator,
+  CreateUserAddressParamsValidator,
+} from './implementations/index';
 import { IValidator } from './IValidator';
 
 export * from './IValidator';
@@ -14,4 +17,9 @@ container.registerSingleton<IValidator>(
 container.registerSingleton<IValidator>(
   'UserParamsValidator',
   UserParamsValidator,
+);
+
+container.registerSingleton<IValidator>(
+  'CreateUserAddressParamsValidator',
+  CreateUserAddressParamsValidator,
 );

@@ -1,7 +1,7 @@
 import { injectable } from 'tsyringe';
 import { getRepository, Repository } from 'typeorm';
 
-import { CreateOrUpdateUserAddressDTO } from '@modules/accounts/dtos';
+import { CreateUserAddressDTO } from '@modules/accounts/dtos';
 import { IUserAddressRepository } from '@modules/accounts/repositories';
 import { NotFoundError } from '@shared/errors/database-query';
 import { Either, left, right } from '@shared/utils';
@@ -16,16 +16,18 @@ export class UserAddressRepository implements IUserAddressRepository {
     this.addressRepository = getRepository(UserAddress);
   }
 
-  async createOrUpdate({
+  async save({
     city,
     district,
     house_number,
+    state,
     id_user,
     postal_code,
-  }: CreateOrUpdateUserAddressDTO): Promise<UserAddress> {
+  }: CreateUserAddressDTO): Promise<UserAddress> {
     const address = this.addressRepository.create({
       city,
       district,
+      state,
       house_number,
       postal_code,
       id_user,
