@@ -10,7 +10,7 @@ import { UserNotFoundError } from '@shared/errors/useCase';
 import { Either, left, right } from '@shared/utils';
 
 @injectable()
-export class CreateOrUpdateUserAddressUseCase {
+class CreateOrUpdateUserAddressUseCase {
   constructor(
     @inject('UserAddressRepository')
     private readonly UserAddressRepository: IUserAddressRepository,
@@ -44,3 +44,5 @@ export class CreateOrUpdateUserAddressUseCase {
     return right(address);
   }
 }
+
+export { CreateOrUpdateUserAddressUseCase };

@@ -15,7 +15,7 @@ import { IController } from '@shared/ports';
 import { CreateOrUpdateUserAddressUseCase } from './create-or-update-user-address-useCase';
 
 @singleton()
-export class CreateOrUpdateUserAddressController implements IController {
+class CreateOrUpdateUserAddressController implements IController {
   constructor(
     @inject('CreateOrUpdateUserAddressUseCase')
     private readonly createOrUpdateUserAddressUseCase: CreateOrUpdateUserAddressUseCase,
@@ -56,3 +56,5 @@ export class CreateOrUpdateUserAddressController implements IController {
     }
   }
 }
+
+export { CreateOrUpdateUserAddressController };

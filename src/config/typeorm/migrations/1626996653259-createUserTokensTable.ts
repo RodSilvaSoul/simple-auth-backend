@@ -45,6 +45,6 @@ implements MigrationInterface {
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.dropTable('refesh_tokens');
+    await queryRunner.dropTable('user_tokens');
   }
 }

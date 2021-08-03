@@ -29,16 +29,20 @@ export class UserPhoneRepository implements IUserPhoneRepository {
       },
     });
 
-    const userPhone = this.phoneRepository.create({
-      phone_number,
-      id_user,
-      userPhoneTypes,
-    });
+    if (userPhoneTypes) {
+      const userPhone = this.phoneRepository.create({
+        phone_number,
+        id_user,
+        userPhoneTypes,
+      });
+      const newPhoneUser = await this.phoneRepository.manager.save(userPhone);
 
-    const newPhoneUser = await this.phoneRepository.save(userPhone);
+      return newPhoneUser;
+    }
 
-    return newPhoneUser;
+    return null;
   }
+
   async findByUserId(
     id_user: string,
   ): Promise<Either<UserNotFoundError, UserPhone>> {

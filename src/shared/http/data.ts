@@ -1,7 +1,9 @@
 export type HttpRequest = {
   body?: any;
   params?: any;
-  query?:any
+  query?: any;
+  headers?: any;
+  user?: any;
 };
 
 export type HttpResponse = {

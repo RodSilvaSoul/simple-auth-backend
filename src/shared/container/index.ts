@@ -1,6 +1,7 @@
 import { container } from 'tsyringe';
 
 import './providers';
+
 import {
   TokenRepository,
   UserRepository,
@@ -23,6 +24,9 @@ import {
   CreateOrUpdateUserAddressUseCase,
   CreateOrUpdateUserPhoneUseCase,
 } from '@modules/accounts/useCases';
+import { IMiddleware } from '@shared/ports/middleware';
+
+import { AuthMiddleware } from '../middlers';
 
 container.registerSingleton<ITokenRepository>(
   'TokenRepository',
@@ -37,8 +41,18 @@ container.registerSingleton<IUserAddressRepository>(
 );
 
 container.registerSingleton<IUserPhoneRepository>(
-  UserPhoneRepository,
   'UserPhoneRepository',
+  UserPhoneRepository,
+);
+
+container.registerSingleton<CreateOrUpdateUserAddressUseCase>(
+  'CreateOrUpdateUserAddressUseCase',
+  CreateOrUpdateUserAddressUseCase,
+);
+
+container.registerSingleton<CreateOrUpdateUserPhoneUseCase>(
+  'CreateOrUpdateUserPhoneUseCase',
+  CreateOrUpdateUserPhoneUseCase,
 );
 
 container.registerSingleton<UserAuthenticateUseCase>(
@@ -71,12 +85,4 @@ container.registerSingleton<VerifyEmailUseCase>(
   VerifyEmailUseCase,
 );
 
-container.registerSingleton<CreateOrUpdateUserAddressUseCase>(
-  CreateOrUpdateUserAddressUseCase,
-  'CreateOrUpdateUserAddressUseCase',
-);
-
-container.registerSingleton<CreateOrUpdateUserPhoneUseCase>(
-  CreateOrUpdateUserPhoneUseCase,
-  'CreateOrUpdateUserPhoneUseCase',
-);
+container.registerSingleton<IMiddleware>('AuthMiddleware', AuthMiddleware);
