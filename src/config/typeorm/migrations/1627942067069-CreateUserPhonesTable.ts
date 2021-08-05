@@ -31,6 +31,7 @@ export class CreateUserPhonesTable1627942067069 implements MigrationInterface {
           {
             name: 'updated_at',
             type: 'timestamp',
+            default: 'now()',
           },
         ],
         foreignKeys: [

@@ -9,7 +9,7 @@ import {
   VerifyEmailController,
   SendVerifyEmailController,
   CreateUserAddressController,
-  CreateOrUpdateUserPhoneController,
+  CreateUserPhoneController,
 } from '@modules/accounts/useCases';
 import {
   expressMiddlewareAdapter,
@@ -36,8 +36,8 @@ const createUserAddressController = container.resolve(
   CreateUserAddressController,
 );
 
-const createOrUpdateUserPhoneController = container.resolve(
-  CreateOrUpdateUserPhoneController,
+const createUserPhoneController = container.resolve(
+  CreateUserPhoneController,
 );
 
 const authMiddleware = container.resolve(AuthMiddleware);
@@ -73,7 +73,7 @@ export default (router: Router) => {
   );
 
   router.post(
-    '/user/address',
+    '/user/address/create',
     expressAuthMiddleware,
     expressRouterAdapter(createUserAddressController),
   );
@@ -81,6 +81,6 @@ export default (router: Router) => {
   router.post(
     '/user/phones',
     expressAuthMiddleware,
-    expressRouterAdapter(createOrUpdateUserPhoneController),
+    expressRouterAdapter(createUserPhoneController),
   );
 };

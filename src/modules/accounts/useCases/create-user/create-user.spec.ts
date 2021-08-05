@@ -99,7 +99,7 @@ describe('create user', () => {
     expect(newUser.isRight()).toBe(true);
   });
 
-  it('should not accpet a empty body request', async () => {
+  it('should not accept a empty body request', async () => {
     const httpResponse = await createUserController.handle({});
 
     expect(httpResponse).toEqual(badRequest(new EmptyBodyError()));
@@ -109,7 +109,9 @@ describe('create user', () => {
     delete httpRequest.body.password;
     const httpResponse = await createUserController.handle(httpRequest);
 
-    expect(httpResponse).toEqual(badRequest(new MissingParamError('password')));
+    expect(httpResponse).toEqual(
+      badRequest(new MissingParamError('The filed(s): [password] is missing.')),
+    );
   });
 
   it('should not accept a invalid email address', async () => {

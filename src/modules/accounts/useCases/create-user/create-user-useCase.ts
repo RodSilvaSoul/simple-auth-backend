@@ -14,7 +14,7 @@ class CreatUserUserCase {
     @inject('UserRepository')
     private readonly userRepository: IUserRepository,
     @inject('UserParamsValidator')
-    private readonly userParamsValidator: IValidator<CreateUserDTO>,
+    private readonly userParamsValidator: IValidator,
     @inject('BcryptFacade')
     private readonly hasherProvider: IHasherProvider,
   ) {}

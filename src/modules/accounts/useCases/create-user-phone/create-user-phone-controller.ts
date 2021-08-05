@@ -1,8 +1,7 @@
 import { inject, singleton } from 'tsyringe';
 
-import { CreateOrUpdateUserPhoneDTO } from '@modules/accounts/dtos';
+import { CreateUserPhoneDTO } from '@modules/accounts/dtos';
 import { IValidator } from '@shared/container/providers';
-import { BodyRequestValidatorParams } from '@shared/container/providers/validator/implementations';
 import {
   badRequest,
   HttpRequest,
@@ -12,31 +11,31 @@ import {
 } from '@shared/http';
 import { IController } from '@shared/ports';
 
-import { CreateOrUpdateUserPhoneUseCase } from './create-or-update-user-phone-useCase';
+import { CreateUserPhoneUseCase } from './create-user-phone-useCase';
 
 @singleton()
-export class CreateOrUpdateUserPhoneController implements IController {
+export class CreateUserPhoneController implements IController {
   constructor(
-    @inject('CreateOrUpdateUserPhoneUseCase')
-    private readonly createOrUpdateUserPhoneUseCase: CreateOrUpdateUserPhoneUseCase,
+    @inject('CreateUserPhoneUseCase')
+    private readonly createUserPhoneUseCase: CreateUserPhoneUseCase,
     @inject('BodyRequestValidator')
-    private readonly bodyRequestValidator: IValidator<BodyRequestValidatorParams>,
+    private readonly bodyRequestValidator: IValidator,
   ) {}
 
   async handle({ body }: HttpRequest): Promise<HttpResponse> {
     try {
       const haveBodyInvalidParams = this.bodyRequestValidator.check({
         body,
-        fields: [],
+        fields: ['id_user', 'type', 'phone_number'],
       });
 
       if (haveBodyInvalidParams.isLeft()) {
         return badRequest(haveBodyInvalidParams.value);
       }
 
-      const { id_user, phone_number, type } = body as CreateOrUpdateUserPhoneDTO;
+      const { id_user, phone_number, type } = body as CreateUserPhoneDTO;
 
-      const result = await this.createOrUpdateUserPhoneUseCase.execute({
+      const result = await this.createUserPhoneUseCase.execute({
         id_user,
         phone_number,
         type,

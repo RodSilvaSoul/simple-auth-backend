@@ -2,7 +2,6 @@ import { inject, singleton } from 'tsyringe';
 
 import { CreateUserAddressDTO } from '@modules/accounts/dtos';
 import { IValidator } from '@shared/container/providers';
-import { BodyRequestValidatorParams } from '@shared/container/providers/validator/implementations';
 import {
   badRequest,
   HttpRequest,
@@ -20,14 +19,21 @@ export class CreateUserAddressController implements IController {
     @inject('CreateUserAddressUseCase')
     private readonly createUserAddressUseCase: CreateUserAddressUseCase,
     @inject('BodyRequestValidator')
-    private readonly bodyRequestValidator: IValidator<BodyRequestValidatorParams>,
+    private readonly bodyRequestValidator: IValidator,
   ) {}
 
   async handle({ body }: HttpRequest): Promise<HttpResponse> {
     try {
       const haveBodyInvalidParams = this.bodyRequestValidator.check({
         body,
-        fields: ['city', 'state', 'house_number', 'id_user', 'postal_code'],
+        fields: [
+          'city',
+          'state',
+          'house_number',
+          'id_user',
+          'postal_code',
+          'district',
+        ],
       });
 
       if (haveBodyInvalidParams.isLeft()) {

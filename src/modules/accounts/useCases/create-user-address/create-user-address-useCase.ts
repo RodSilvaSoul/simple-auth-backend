@@ -1,7 +1,6 @@
 import { inject, injectable } from 'tsyringe';
 
 import { CreateUserAddressDTO } from '@modules/accounts/dtos';
-import { UserAddress } from '@modules/accounts/infra/typorm/entities';
 import {
   IUserAddressRepository,
   IUserRepository,
@@ -9,6 +8,8 @@ import {
 import { IValidator } from '@shared/container/providers';
 import { UserNotFoundError } from '@shared/errors/useCase';
 import { Either, left, right } from '@shared/utils';
+
+import { UserAlreadyHaveAddress } from './errors';
 
 @injectable()
 export class CreateUserAddressUseCase {
@@ -18,7 +19,7 @@ export class CreateUserAddressUseCase {
     @inject('UserRepository')
     private readonly userRepository: IUserRepository,
     @inject('CreateUserAddressParamsValidator')
-    private readonly validator: IValidator<CreateUserAddressDTO>,
+    private readonly validator: IValidator,
   ) {}
 
   async execute({
@@ -28,7 +29,9 @@ export class CreateUserAddressUseCase {
     district,
     house_number,
     postal_code,
-  }: CreateUserAddressDTO): Promise<Either<UserNotFoundError, UserAddress>> {
+  }: CreateUserAddressDTO): Promise<
+    Either<UserNotFoundError, CreateUserAddressDTO>
+  > {
     const haveAInvalidParam = this.validator.check({
       city,
       district,
@@ -46,6 +49,14 @@ export class CreateUserAddressUseCase {
 
     if (userExits.isLeft()) {
       return left(new UserNotFoundError());
+    }
+
+    const alreadyHaveAddress = await this.UserAddressRepository.findByUserId(
+      id_user,
+    );
+
+    if (alreadyHaveAddress.isRight()) {
+      return left(new UserAlreadyHaveAddress());
     }
 
     const address = await this.UserAddressRepository.save({

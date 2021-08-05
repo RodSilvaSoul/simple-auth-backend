@@ -22,7 +22,7 @@ import {
   SendVerifyEmailUseCase,
   VerifyEmailUseCase,
   CreateUserAddressUseCase,
-  CreateOrUpdateUserPhoneUseCase,
+  CreateUserPhoneUseCase,
 } from '@modules/accounts/useCases';
 import { IMiddleware } from '@shared/ports/middleware';
 
@@ -50,9 +50,9 @@ container.registerSingleton<CreateUserAddressUseCase>(
   CreateUserAddressUseCase,
 );
 
-container.registerSingleton<CreateOrUpdateUserPhoneUseCase>(
-  'CreateOrUpdateUserPhoneUseCase',
-  CreateOrUpdateUserPhoneUseCase,
+container.registerSingleton<CreateUserPhoneUseCase>(
+  'CreateUserPhoneUseCase',
+  CreateUserPhoneUseCase,
 );
 
 container.registerSingleton<UserAuthenticateUseCase>(

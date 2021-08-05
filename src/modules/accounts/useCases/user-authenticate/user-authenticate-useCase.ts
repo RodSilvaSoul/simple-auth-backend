@@ -13,7 +13,7 @@ import {
 } from '@shared/container/providers';
 import { Either, left, right } from '@shared/utils';
 
-import { EmailOrPasswordInvalid } from './erros';
+import { EmailOrPasswordInvalid } from './errors';
 
 type Response = {
   accessToken: string;
@@ -89,14 +89,14 @@ export class UserAuthenticateUseCase {
       id,
     );
 
-    const refresh_token_experis_data = this.dateProvider.addDays(
+    const refresh_token_expires_data = this.dateProvider.addDays(
       expires_refresh_token_days,
     );
 
     await this.tokenRepository.add({
       token: refreshToken,
       id_user: id,
-      expires_in: refresh_token_experis_data,
+      expires_in: refresh_token_expires_data,
     });
 
     const response: Response = {

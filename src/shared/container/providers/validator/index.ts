@@ -4,6 +4,7 @@ import {
   BodyRequestValidator,
   UserParamsValidator,
   CreateUserAddressParamsValidator,
+  CreateUserPhoneParamsValidator,
 } from './implementations/index';
 import { IValidator } from './IValidator';
 
@@ -22,4 +23,9 @@ container.registerSingleton<IValidator>(
 container.registerSingleton<IValidator>(
   'CreateUserAddressParamsValidator',
   CreateUserAddressParamsValidator,
+);
+
+container.registerSingleton<IValidator>(
+  'CreateUserPhoneParamsValidator',
+  CreateUserPhoneParamsValidator,
 );

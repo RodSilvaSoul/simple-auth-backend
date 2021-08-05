@@ -1,4 +1,4 @@
-import { CreateOrUpdateUserAddressDTO } from '@modules/accounts/dtos';
+import { CreateUserAddressDTO } from '@modules/accounts/dtos';
 import { UserAddress } from '@modules/accounts/infra/typorm/entities';
 import { NotFoundError } from '@shared/errors/database-query';
 import { Either, left, right } from '@shared/utils';
@@ -8,16 +8,14 @@ import { IUserAddressRepository } from '..';
 export class UserAddressInMemoryRepository implements IUserAddressRepository {
   public address: UserAddress[] = [];
 
-  async createOrUpdate(
-    params: CreateOrUpdateUserAddressDTO,
-  ): Promise<UserAddress> {
+  async save(params: CreateUserAddressDTO): Promise<CreateUserAddressDTO> {
     const userAddress = new UserAddress();
 
     const newUserAddress = Object.assign(userAddress, params);
 
     this.address.push(newUserAddress);
 
-    return newUserAddress;
+    return params;
   }
 
   async findByUserId(

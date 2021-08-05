@@ -15,8 +15,8 @@ import {
   unauthorized,
 } from '@shared/http';
 
-import { EmailOrPasswordInvalid } from './erros';
-import { UserAuthenticateController } from './user-authenticade-controller';
+import { EmailOrPasswordInvalid } from './errors';
+import { UserAuthenticateController } from './user-authenticate-controller';
 import { UserAuthenticateUseCase } from './user-authenticate-useCase';
 
 let userAuthenticateUseCase: UserAuthenticateUseCase;
@@ -129,13 +129,13 @@ describe('user authenticate', () => {
 
     const { id } = await userRepository.add(user_db);
 
-    const httpReponse = await userAuthenticateController.handle(request_body);
+    const httpResponse = await userAuthenticateController.handle(request_body);
 
     const { email, name } = user_db;
 
-    expect(httpReponse.statusCode).toBe(200);
+    expect(httpResponse.statusCode).toBe(200);
 
-    expect(httpReponse.body).toEqual(
+    expect(httpResponse.body).toEqual(
       expect.objectContaining({
         user: {
           id,
@@ -145,8 +145,8 @@ describe('user authenticate', () => {
       }),
     );
 
-    expect(httpReponse.body.refreshToken).toBeTruthy();
-    expect(httpReponse.body.accessToken).toBeTruthy();
+    expect(httpResponse.body.refreshToken).toBeTruthy();
+    expect(httpResponse.body.accessToken).toBeTruthy();
   });
 
   it('should not authenticate a user with invalid credentials', async () => {
@@ -168,23 +168,23 @@ describe('user authenticate', () => {
 
     await userRepository.add(user_db);
 
-    const httpReponse = await userAuthenticateController.handle({
+    const httpResponse = await userAuthenticateController.handle({
       body: {
         ...request_body.body,
         password: '123',
       },
     });
 
-    expect(httpReponse).toEqual(unauthorized(new EmailOrPasswordInvalid()));
+    expect(httpResponse).toEqual(unauthorized(new EmailOrPasswordInvalid()));
   });
 
-  it('should not accpet a empty body request', async () => {
+  it('should not accept a empty body request', async () => {
     const httpResponse = await userAuthenticateController.handle({});
 
     expect(httpResponse).toEqual(badRequest(new EmptyBodyError()));
   });
 
-  it('should not accpet a body request missing a requerid field', async () => {
+  it('should not accept a body request missing a required fields', async () => {
     const request_body = {
       body: {
         email: faker.internet.email(),
@@ -192,7 +192,9 @@ describe('user authenticate', () => {
     };
     const httpResponse = await userAuthenticateController.handle(request_body);
 
-    expect(httpResponse).toEqual(badRequest(new MissingParamError('password')));
+    expect(httpResponse).toEqual(
+      badRequest(new MissingParamError('The filed(s): [password] is missing.')),
+    );
   });
 
   it('should returns a server error if userAuthenticateUseCase.execute() throws an error', async () => {

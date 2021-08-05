@@ -11,23 +11,24 @@ export type BodyRequestValidatorParams = {
 };
 
 @injectable()
-export class BodyRequestValidator
-implements IValidator {
+export class BodyRequestValidator implements IValidator {
   check({ body, fields }: BodyRequestValidatorParams): Either<Error, true> {
     if (!body || !Object.keys(body).length) {
       return left(new EmptyBodyError());
     }
 
-    const isMissingParam = fields.find((field) => {
-      if (!body[field]) {
-        return true;
-      }
+    const missingParams: string[] = [];
 
-      return false;
+    fields.forEach((field) => {
+      if (!body[field]) {
+        missingParams.push(field);
+      }
     });
 
-    if (isMissingParam) {
-      return left(new MissingParamError(isMissingParam));
+    if (missingParams.length) {
+      return left(
+        new MissingParamError(`The filed(s): [${missingParams.toString()}] is missing.`),
+      );
     }
 
     return right(true);

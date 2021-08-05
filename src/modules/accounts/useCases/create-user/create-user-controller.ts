@@ -1,7 +1,6 @@
 import { singleton, inject } from 'tsyringe';
 
 import { IValidator } from '@shared/container/providers/validator';
-import { BodyRequestValidatorParams } from '@shared/container/providers/validator/implementations/body-request-validator';
 import {
   HttpRequest,
   HttpResponse,
@@ -19,7 +18,7 @@ export class CreateUserController implements IController {
     @inject('CreatUserUserCase')
     private readonly createUserUseCase: CreatUserUserCase,
     @inject('BodyRequestValidator')
-    private readonly bodyRequestValidator: IValidator<BodyRequestValidatorParams>,
+    private readonly bodyRequestValidator: IValidator,
   ) {}
 
   async handle({ body }: HttpRequest): Promise<HttpResponse> {
@@ -41,7 +40,6 @@ export class CreateUserController implements IController {
 
       return created();
     } catch (error) {
-      console.log(error);
       return serverError();
     }
   }

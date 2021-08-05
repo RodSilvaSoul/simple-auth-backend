@@ -1,43 +1,52 @@
 import { injectable } from 'tsyringe';
 import { getRepository, Repository } from 'typeorm';
 
-import { CreateOrUpdateUserPhoneDTO } from '@modules/accounts/dtos';
+import { CreateUserPhoneDTO } from '@modules/accounts/dtos';
 import { IUserPhoneRepository } from '@modules/accounts/repositories';
 import { UserNotFoundError } from '@shared/errors/useCase';
 import { Either, left, right } from '@shared/utils';
 
-import { UserPhone, UserPhoneTypes } from '../entities';
+import { User, UserPhone, UserPhoneTypes } from '../entities';
 
 @injectable()
 export class UserPhoneRepository implements IUserPhoneRepository {
   private phoneRepository: Repository<UserPhone>;
   private phoneTypeRepository: Repository<UserPhoneTypes>;
+  private userRepository: Repository<User>;
 
   constructor() {
     this.phoneRepository = getRepository(UserPhone);
     this.phoneTypeRepository = getRepository(UserPhoneTypes);
+    this.userRepository = getRepository(User);
   }
 
-  async createOrUpdate({
+  async save({
     type,
     id_user,
     phone_number,
-  }: CreateOrUpdateUserPhoneDTO): Promise<UserPhone> {
+  }: CreateUserPhoneDTO): Promise<CreateUserPhoneDTO> {
     const userPhoneTypes = await this.phoneTypeRepository.findOne({
       where: {
         type,
       },
     });
 
+    const user = await this.userRepository.findOne(id_user);
+
     if (userPhoneTypes) {
       const userPhone = this.phoneRepository.create({
         phone_number,
-        id_user,
+        user,
         userPhoneTypes,
       });
-      const newPhoneUser = await this.phoneRepository.manager.save(userPhone);
 
-      return newPhoneUser;
+      await this.phoneRepository.manager.save(userPhone);
+
+      return {
+        id_user,
+        phone_number,
+        type,
+      };
     }
 
     return null;
@@ -45,10 +54,12 @@ export class UserPhoneRepository implements IUserPhoneRepository {
 
   async findByUserId(
     id_user: string,
-  ): Promise<Either<UserNotFoundError, UserPhone>> {
+  ): Promise<Either<UserNotFoundError, CreateUserPhoneDTO>> {
+    const user = await this.userRepository.findOne(id_user);
+
     const phoneUser = await this.phoneRepository.findOne({
       where: {
-        id_user,
+        user,
       },
       relations: ['user_phones_types'],
     });
@@ -57,6 +68,12 @@ export class UserPhoneRepository implements IUserPhoneRepository {
       return left(new UserNotFoundError());
     }
 
-    return right(phoneUser);
+    const { phone_number, userPhoneTypes } = phoneUser;
+
+    return right({
+      phone_number,
+      id_user,
+      type: userPhoneTypes.type,
+    });
   }
 }

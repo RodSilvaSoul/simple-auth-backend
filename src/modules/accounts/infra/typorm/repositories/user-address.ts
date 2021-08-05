@@ -6,14 +6,15 @@ import { IUserAddressRepository } from '@modules/accounts/repositories';
 import { NotFoundError } from '@shared/errors/database-query';
 import { Either, left, right } from '@shared/utils';
 
-import { UserAddress } from '../entities';
+import { User, UserAddress } from '../entities';
 
 @injectable()
 export class UserAddressRepository implements IUserAddressRepository {
   private addressRepository: Repository<UserAddress>;
-
+  private userRepository: Repository<User>;
   constructor() {
     this.addressRepository = getRepository(UserAddress);
+    this.userRepository = getRepository(User);
   }
 
   async save({
@@ -23,26 +24,37 @@ export class UserAddressRepository implements IUserAddressRepository {
     state,
     id_user,
     postal_code,
-  }: CreateUserAddressDTO): Promise<UserAddress> {
+  }: CreateUserAddressDTO): Promise<CreateUserAddressDTO> {
+    const user = await this.userRepository.findOne(id_user);
+
     const address = this.addressRepository.create({
       city,
       district,
       state,
       house_number,
       postal_code,
-      id_user,
+      user,
     });
 
-    const result = await this.addressRepository.manager.save(address);
+    await this.addressRepository.manager.save(address);
 
-    return result;
+    return {
+      city,
+      district,
+      house_number,
+      state,
+      id_user,
+      postal_code,
+    };
   }
   async findByUserId(
     id_user: string,
   ): Promise<Either<NotFoundError, UserAddress>> {
+    const user = await this.userRepository.findOne(id_user);
+
     const userAddress = await this.addressRepository.findOne({
       where: {
-        id_user,
+        user,
       },
     });
 

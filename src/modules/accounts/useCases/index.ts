@@ -5,4 +5,4 @@ export * from './send-forgot-password-email';
 export * from './send-verify-email';
 export * from './verify-email';
 export * from './create-user-address';
-export * from './create-or-updated-user-phone';
+export * from './create-user-phone';

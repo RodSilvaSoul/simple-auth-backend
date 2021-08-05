@@ -12,7 +12,7 @@ export class CreateUserAddressTable1627941088896 implements MigrationInterface {
             isPrimary: true,
           },
           {
-            name: 'country',
+            name: 'state',
             type: 'varchar',
           },
           {
@@ -43,6 +43,7 @@ export class CreateUserAddressTable1627941088896 implements MigrationInterface {
           {
             name: 'updated_at',
             type: 'timestamp',
+            default: 'now()',
           },
         ],
         foreignKeys: [
