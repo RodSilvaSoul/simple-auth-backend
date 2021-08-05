@@ -5,7 +5,7 @@ import type { CreateUserAddressDTO, UpdateUserAddressDTO } from '../dtos';
 import { UserAddress } from '../infra/typorm/entities';
 
 export interface IUserAddressRepository {
-  save(param: CreateUserAddressDTO): Promise<CreateUserAddressDTO>;
+  save(params: CreateUserAddressDTO): Promise<CreateUserAddressDTO>;
   findByUserId(userId: string): Promise<Either<NotFoundError, UserAddress>>;
-  update(param: UpdateUserAddressDTO): Promise<Either<ErrorOnUpdate, true>>;
+  update(params: UpdateUserAddressDTO): Promise<Either<ErrorOnUpdate, true>>;
 }
