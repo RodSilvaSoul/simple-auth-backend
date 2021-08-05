@@ -1,20 +1,22 @@
 import { injectable } from 'tsyringe';
 import { getRepository, Repository } from 'typeorm';
 
-import { CreateUserAddressDTO } from '@modules/accounts/dtos';
+import {
+  CreateUserAddressDTO,
+  UpdateUserAddressDTO,
+} from '@modules/accounts/dtos';
 import { IUserAddressRepository } from '@modules/accounts/repositories';
-import { NotFoundError } from '@shared/errors/database-query';
+import { ErrorOnUpdate, NotFoundError } from '@shared/errors/database-query';
 import { Either, left, right } from '@shared/utils';
 
-import { User, UserAddress } from '../entities';
+import { UserAddress } from '../entities';
 
 @injectable()
 export class UserAddressRepository implements IUserAddressRepository {
   private addressRepository: Repository<UserAddress>;
-  private userRepository: Repository<User>;
+
   constructor() {
     this.addressRepository = getRepository(UserAddress);
-    this.userRepository = getRepository(User);
   }
 
   async save({
@@ -59,5 +61,28 @@ export class UserAddressRepository implements IUserAddressRepository {
     }
 
     return right(userAddress);
+  }
+
+  async update({
+    city,
+    district,
+    house_number,
+    id_user,
+    postal_code,
+    state,
+  }: UpdateUserAddressDTO): Promise<Either<ErrorOnUpdate, true>> {
+    const result = await this.addressRepository.update(id_user, {
+      city,
+      postal_code,
+      state,
+      district,
+      house_number,
+    });
+
+    if (!result.affected) {
+      return left(new ErrorOnUpdate());
+    }
+
+    return right(true);
   }
 }

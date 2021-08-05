@@ -1,3 +1,5 @@
+import faker from 'faker';
+
 import { CreateUserAddressDTO, CreateUserDTO } from '@modules/accounts/dtos';
 import {
   UserAddressInMemoryRepository,
@@ -32,12 +34,12 @@ const userAddressMock: CreateUserAddressDTO = {
   state: 'any_state',
   district: 'any_district',
   house_number: 1,
-  id_user: 'any_id_user',
+  id_user: faker.datatype.uuid(),
   postal_code: 'any_postal_code',
 };
 
 const user_mock: CreateUserDTO = {
-  id: 'any_id_user',
+  id: faker.datatype.uuid(),
   email: 'any_email',
   name: 'any_name',
   password: 'any_password',
@@ -73,8 +75,8 @@ describe('Create or update user address', () => {
     await createUserAddressUseCase.execute(userAddressMock);
 
     expect(checkSpy).toBeCalledWith(userAddressMock);
-    expect(findByIdSpy).toBeCalledWith('any_id_user');
-    expect(findByUserIdSpy).toBeCalledWith('any_id_user');
+    expect(findByIdSpy).toBeCalledWith(userAddressMock.id_user);
+    expect(findByUserIdSpy).toBeCalledWith(userAddressMock.id_user);
     expect(saveSpy).toBeCalledWith(userAddressMock);
   });
 
@@ -204,11 +206,7 @@ describe('Create or update user address', () => {
 
   it('should not accept a invalid postal_code', async () => {
     const invalid_Body = {
-      city: 'any_city',
-      state: 'any_state',
-      district: 'any_district',
-      house_number: 1,
-      id_user: 'any_id_user',
+      ...userAddressMock,
       postal_code: 'any',
     };
 
@@ -219,6 +217,21 @@ describe('Create or update user address', () => {
     expect(http_response).toEqual(
       badRequest(
         new InvalidParamError('The param postal_code sent is not valid'),
+      ),
+    );
+  });
+
+  it('should not accept a id_user with a invalid uuid format ', async () => {
+    const invalid_Body = {
+      ...userAddressMock,
+      id_user: 'any',
+    };
+
+    const http_response = await createUserAddressController.handle({ body: invalid_Body });
+
+    expect(http_response).toEqual(
+      badRequest(
+        new InvalidParamError('The id_user does not have a valid uuid format'),
       ),
     );
   });

@@ -15,7 +15,7 @@ export class UserPhoneInMemory implements IUserPhoneRepository {
 
     this.userPhones.push(newUserPhone);
 
-    return newUserPhone;
+    return params;
   }
   async findByUserId(
     user_id: string,

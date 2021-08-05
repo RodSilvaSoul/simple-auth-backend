@@ -1,3 +1,5 @@
+import faker from 'faker';
+
 import { CreateUserPhoneDTO } from '@modules/accounts/dtos';
 import {
   UserPhoneInMemory,
@@ -8,7 +10,7 @@ import {
   CreateUserPhoneParamsValidator,
 } from '@shared/container/providers/validator/implementations';
 import { UserNotFoundError } from '@shared/errors/useCase';
-import { EmptyBodyError } from '@shared/errors/validator';
+import { EmptyBodyError, InvalidParamError } from '@shared/errors/validator';
 import { badRequest } from '@shared/http';
 import { right } from '@shared/utils';
 
@@ -23,13 +25,13 @@ let userPhoneRepository: UserPhoneInMemory;
 let createUserPhoneParamsValidator: CreateUserPhoneParamsValidator;
 
 const user_mock = {
-  id: 'any_id',
+  id: faker.datatype.uuid(),
   email: 'user@example.com',
   password: 'any_password',
 };
 
 const user_phone_mock: CreateUserPhoneDTO = {
-  id_user: 'any_id',
+  id_user: faker.datatype.uuid(),
   phone_number: 'any_phone_number',
   type: 'any_type',
 };
@@ -64,10 +66,10 @@ describe('create or update user phone use case', () => {
 
     await createUserPhoneUseCase.execute(user_phone_mock);
 
-    expect(findByIdSpy).toBeCalledWith('any_id');
+    expect(findByIdSpy).toBeCalledWith(user_phone_mock.id_user);
     expect(createOrUpdateSpy).toBeCalledWith(user_phone_mock);
     expect(checkSpy).toBeCalledWith(user_phone_mock);
-    expect(findByUserIdSpy).toBeCalledWith('any_id');
+    expect(findByUserIdSpy).toBeCalledWith(user_phone_mock.id_user);
   });
 
   it('should createUserPhoneController call your methods correctly', async () => {
@@ -132,5 +134,22 @@ describe('create or update user phone use case', () => {
     const http_response = await createUserPhoneController.handle(http_request);
 
     expect(http_response).toEqual(badRequest(new UserAlreadyHavePhone()));
+  });
+
+  it('should not accept a id_user with a invalid uuid format', async () => {
+    const http_request = {
+      body: {
+        ...user_phone_mock,
+        id_user: 'invalid_id',
+      },
+    };
+
+    const http_response = await createUserPhoneController.handle(http_request);
+
+    expect(http_response).toEqual(
+      badRequest(
+        new InvalidParamError('The id_user does not have a valid uuid format'),
+      ),
+    );
   });
 });
