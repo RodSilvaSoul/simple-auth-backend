@@ -16,6 +16,7 @@ export class UserAddress {
   @PrimaryColumn()
   id: string;
 
+  @Column()
   id_user: string;
 
   @OneToOne(() => User)

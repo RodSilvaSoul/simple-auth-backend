@@ -79,7 +79,7 @@ export default (router: Router) => {
   );
 
   router.post(
-    '/user/phones',
+    '/user/phones/create',
     expressAuthMiddleware,
     expressRouterAdapter(createUserPhoneController),
   );

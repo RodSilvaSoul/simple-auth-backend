@@ -2,12 +2,10 @@ import {
   Column,
   CreateDateColumn,
   Entity,
-  OneToMany,
   PrimaryColumn,
   UpdateDateColumn,
 } from 'typeorm';
-
-import { UserPhone } from './user_phone';
+import { v4 as uuidV4 } from 'uuid';
 
 @Entity('user_phones_types')
 export class UserPhoneTypes {
@@ -17,12 +15,15 @@ export class UserPhoneTypes {
   @Column()
   type: string;
 
-  @OneToMany(() => UserPhone, (userPhone) => userPhone.userPhoneTypes)
-  userPhone?: UserPhone[];
-
   @CreateDateColumn()
   created_at: Date;
 
   @UpdateDateColumn()
   updated_at: Date;
+
+  constructor() {
+    if (!this.id) {
+      this.id = uuidV4();
+    }
+  }
 }

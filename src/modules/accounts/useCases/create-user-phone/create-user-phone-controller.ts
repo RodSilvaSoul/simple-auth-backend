@@ -46,7 +46,7 @@ export class CreateUserPhoneController implements IController {
       }
 
       return ok(result.value);
-    } catch {
+    } catch (error) {
       return serverError();
     }
   }

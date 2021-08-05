@@ -55,13 +55,11 @@ export class UserPhoneRepository implements IUserPhoneRepository {
   async findByUserId(
     id_user: string,
   ): Promise<Either<UserNotFoundError, CreateUserPhoneDTO>> {
-    const user = await this.userRepository.findOne(id_user);
-
     const phoneUser = await this.phoneRepository.findOne({
       where: {
-        user,
+        id_user,
       },
-      relations: ['user_phones_types'],
+      relations: ['userPhoneTypes'],
     });
 
     if (!phoneUser) {

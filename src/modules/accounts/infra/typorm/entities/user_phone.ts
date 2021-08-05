@@ -8,6 +8,7 @@ import {
   PrimaryColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { v4 as uuidV4 } from 'uuid';
 
 import { User } from '.';
 import { UserPhoneTypes } from './user_phone_types';
@@ -17,11 +18,13 @@ export class UserPhone {
   @PrimaryColumn()
   id: string;
 
+  @Column()
   id_user_phone_types: string;
 
+  @Column()
   id_user: string;
 
-  @ManyToOne(() => UserPhoneTypes, (userPhoneTypes) => userPhoneTypes.userPhone)
+  @ManyToOne(() => UserPhoneTypes)
   @JoinColumn({ name: 'id_user_phone_types' })
   userPhoneTypes: UserPhoneTypes;
 
@@ -37,4 +40,10 @@ export class UserPhone {
 
   @UpdateDateColumn()
   updated_at: Date;
+
+  constructor() {
+    if (!this.id) {
+      this.id = uuidV4();
+    }
+  }
 }

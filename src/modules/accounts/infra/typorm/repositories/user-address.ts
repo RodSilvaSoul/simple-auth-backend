@@ -25,18 +25,16 @@ export class UserAddressRepository implements IUserAddressRepository {
     id_user,
     postal_code,
   }: CreateUserAddressDTO): Promise<CreateUserAddressDTO> {
-    const user = await this.userRepository.findOne(id_user);
-
     const address = this.addressRepository.create({
       city,
       district,
       state,
       house_number,
       postal_code,
-      user,
+      id_user,
     });
 
-    await this.addressRepository.manager.save(address);
+    await this.addressRepository.save(address);
 
     return {
       city,
@@ -50,11 +48,9 @@ export class UserAddressRepository implements IUserAddressRepository {
   async findByUserId(
     id_user: string,
   ): Promise<Either<NotFoundError, UserAddress>> {
-    const user = await this.userRepository.findOne(id_user);
-
     const userAddress = await this.addressRepository.findOne({
       where: {
-        user,
+        id_user,
       },
     });
 

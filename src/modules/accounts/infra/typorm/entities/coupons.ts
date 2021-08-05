@@ -7,6 +7,7 @@ import {
   PrimaryColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { v4 as uuidV4 } from 'uuid';
 
 import { User } from './user';
 
@@ -36,4 +37,10 @@ export class Coupons {
 
   @UpdateDateColumn()
   updated_at: string;
+
+  constructor() {
+    if (!this.id) {
+      this.id = uuidV4();
+    }
+  }
 }
