@@ -7,7 +7,9 @@ import {
 } from '@modules/accounts/dtos';
 import { IUserAddressRepository } from '@modules/accounts/repositories';
 import { ErrorOnUpdate, NotFoundError } from '@shared/errors/database-query';
-import { Either, left, right } from '@shared/utils';
+import {
+  Either, filterAvailableParams, left, right,
+} from '@shared/utils';
 
 import { UserAddress } from '../entities';
 
@@ -64,20 +66,25 @@ export class UserAddressRepository implements IUserAddressRepository {
   }
 
   async update({
-    city,
-    district,
-    house_number,
     id_user,
-    postal_code,
-    state,
+    ...rest
   }: UpdateUserAddressDTO): Promise<Either<ErrorOnUpdate, true>> {
-    const result = await this.addressRepository.update(id_user, {
-      city,
-      postal_code,
-      state,
-      district,
-      house_number,
-    });
+    const data = filterAvailableParams([
+      'house_number',
+      'city',
+      'district',
+      'state',
+      'postal_code',
+    ], rest);
+
+    const result = await this.addressRepository.update(
+      {
+        id_user,
+      },
+      {
+        ...data,
+      },
+    );
 
     if (!result.affected) {
       return left(new ErrorOnUpdate());
