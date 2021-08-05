@@ -18,7 +18,7 @@ export class UpdateUserAddressUseCase {
     private readonly userRepository: IUserRepository,
     @inject('UserAddressRepository')
     private readonly userAddressRepository: IUserAddressRepository,
-    @inject('')
+    @inject('UpdateUserAddressParamsValidator')
     private readonly validator: IValidator,
   ) {}
 

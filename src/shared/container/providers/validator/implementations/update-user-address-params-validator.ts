@@ -3,28 +3,46 @@ import { injectable } from 'tsyringe';
 import { validate as uuidValidator } from 'uuid';
 
 import { UpdateUserAddressDTO } from '@modules/accounts/dtos';
-import { InvalidParamError } from '@shared/errors/validator';
+import { InvalidParamError, MissingParamError } from '@shared/errors/validator';
 import { Either, left, right } from '@shared/utils';
 
 import { IValidator } from '../IValidator';
 
 @injectable()
 export class UpdateUserAddressParamsValidator implements IValidator {
-  check({
-    id_user,
-    house_number,
-    ...rest
-  }: UpdateUserAddressDTO): Either<Error, true> {
+  check({ id_user, ...rest }: UpdateUserAddressDTO): Either<Error, true> {
+    const params = Object.keys(rest).filter((field) => {
+      if (rest[field]) {
+        return true;
+      }
+
+      return false;
+    });
+
+    if (!params.length) {
+      const availableParams = [
+        'house_number',
+        'city',
+        'district',
+        'state',
+        'postal_code',
+      ];
+
+      return left(
+        new MissingParamError(
+          `The requisition must includes at least one of the following fields: [${availableParams.toString()}].`,
+        ),
+      );
+    }
+
     if (!uuidValidator(id_user)) {
       return left(
         new InvalidParamError('The id_user does not have a valid uuid format'),
       );
     }
 
-    const params: string[] = Object.values(rest);
-
     const invalidParam = params.find((field) => {
-      if (field.length < 3) {
+      if (String(rest[field]).length < 3 && field !== 'house_number') {
         return true;
       }
 
@@ -42,7 +60,7 @@ export class UpdateUserAddressParamsValidator implements IValidator {
       );
     }
 
-    if (rest?.postal_code.length < 7) {
+    if (rest?.postal_code?.length < 7) {
       return left(
         new InvalidParamError('The param postal_code sent is not valid'),
       );

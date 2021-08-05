@@ -23,6 +23,7 @@ import {
   VerifyEmailUseCase,
   CreateUserAddressUseCase,
   CreateUserPhoneUseCase,
+  UpdateUserAddressUseCase,
 } from '@modules/accounts/useCases';
 import { IMiddleware } from '@shared/ports/middleware';
 
@@ -48,6 +49,11 @@ container.registerSingleton<IUserPhoneRepository>(
 container.registerSingleton<CreateUserAddressUseCase>(
   'CreateUserAddressUseCase',
   CreateUserAddressUseCase,
+);
+
+container.registerSingleton<UpdateUserAddressUseCase>(
+  'UpdateUserAddressUseCase',
+  UpdateUserAddressUseCase,
 );
 
 container.registerSingleton<CreateUserPhoneUseCase>(
