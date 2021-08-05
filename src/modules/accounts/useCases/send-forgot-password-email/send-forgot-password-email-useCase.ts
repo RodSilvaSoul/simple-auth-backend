@@ -5,8 +5,15 @@ import {
   ITokenRepository,
   IUserRepository,
 } from '@modules/accounts/repositories';
-import { IDateProvider, IMailProvider, IUuidProvider } from '@shared/container/providers';
-import { EmailNotVerifiedError, UserNotFoundError } from '@shared/errors/useCase';
+import {
+  IDateProvider,
+  IMailProvider,
+  IUuidProvider,
+} from '@shared/container/providers';
+import {
+  EmailNotVerifiedError,
+  UserNotFoundError,
+} from '@shared/errors/useCase';
 import { Either, left, right } from '@shared/utils';
 
 @injectable()
@@ -24,7 +31,7 @@ export class SendForgotPasswordEmailUseCase {
     private readonly mailProvider: IMailProvider,
   ) {}
 
-  async execute(email: string): Promise<Either<UserNotFoundError, true>> {
+  async execute(email: string): Promise<Either<Error, true>> {
     const user = await this.userRepository.findByEmail(email);
 
     if (user.isLeft()) {

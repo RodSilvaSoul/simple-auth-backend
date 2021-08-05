@@ -1,23 +1,22 @@
 import { injectable } from 'tsyringe';
 import { getRepository, Repository } from 'typeorm';
 
-import { CreateUserPhoneDTO } from '@modules/accounts/dtos';
+import { CreateUserPhoneDTO, UpdateUserPhoneDTO } from '@modules/accounts/dtos';
 import { IUserPhoneRepository } from '@modules/accounts/repositories';
+import { ErrorOnUpdate } from '@shared/errors/database-query';
 import { UserNotFoundError } from '@shared/errors/useCase';
 import { Either, left, right } from '@shared/utils';
 
-import { User, UserPhone, UserPhoneTypes } from '../entities';
+import { UserPhone, UserPhoneTypes } from '../entities';
 
 @injectable()
 export class UserPhoneRepository implements IUserPhoneRepository {
   private phoneRepository: Repository<UserPhone>;
   private phoneTypeRepository: Repository<UserPhoneTypes>;
-  private userRepository: Repository<User>;
 
   constructor() {
     this.phoneRepository = getRepository(UserPhone);
     this.phoneTypeRepository = getRepository(UserPhoneTypes);
-    this.userRepository = getRepository(User);
   }
 
   async save({
@@ -31,12 +30,10 @@ export class UserPhoneRepository implements IUserPhoneRepository {
       },
     });
 
-    const user = await this.userRepository.findOne(id_user);
-
     if (userPhoneTypes) {
       const userPhone = this.phoneRepository.create({
         phone_number,
-        user,
+        id_user,
         userPhoneTypes,
       });
 
@@ -72,6 +69,53 @@ export class UserPhoneRepository implements IUserPhoneRepository {
       phone_number,
       id_user,
       type: userPhoneTypes.type,
+    });
+  }
+
+  async update({
+    id_user,
+    phone_number,
+    type,
+  }: UpdateUserPhoneDTO): Promise<Either<ErrorOnUpdate, UpdateUserPhoneDTO>> {
+    if (type) {
+      const typeData = await this.phoneTypeRepository.findOne({
+        where: {
+          type,
+        },
+      });
+
+      if (!typeData) {
+        return left(new ErrorOnUpdate());
+      }
+
+      if (typeData) {
+        const result = await this.phoneRepository.update(
+          { id_user },
+          {
+            id_user_phone_types: typeData.id,
+          },
+        );
+
+        if (!result.affected) {
+          return left(new ErrorOnUpdate());
+        }
+      }
+    }
+
+    if (phone_number) {
+      const phoneData = await this.phoneRepository.update(
+        { id_user },
+        { phone_number },
+      );
+
+      if (!phoneData.affected) {
+        return left(new ErrorOnUpdate());
+      }
+    }
+
+    return right({
+      phone_number,
+      type,
     });
   }
 }

@@ -6,6 +6,7 @@ import {
   CreateUserAddressParamsValidator,
   CreateUserPhoneParamsValidator,
   UpdateUserAddressParamsValidator,
+  UpdateUserPhoneParamsValidator,
 } from './implementations/index';
 import { IValidator } from './IValidator';
 
@@ -34,4 +35,9 @@ container.registerSingleton<IValidator>(
 container.registerSingleton<IValidator>(
   'UpdateUserAddressParamsValidator',
   UpdateUserAddressParamsValidator,
+);
+
+container.registerSingleton<IValidator>(
+  'UpdateUserPhoneParamsValidator',
+  UpdateUserPhoneParamsValidator,
 );
