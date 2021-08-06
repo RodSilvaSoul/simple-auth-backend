@@ -9,7 +9,7 @@ import { IUserRepository } from '../../repositories';
 import { EmailAlreadyUseError } from './errors';
 
 @injectable()
-class CreatUserUserCase {
+class CreatUserUseCase {
   constructor(
     @inject('UserRepository')
     private readonly userRepository: IUserRepository,
@@ -52,4 +52,4 @@ class CreatUserUserCase {
   }
 }
 
-export { CreatUserUserCase };
+export { CreatUserUseCase };

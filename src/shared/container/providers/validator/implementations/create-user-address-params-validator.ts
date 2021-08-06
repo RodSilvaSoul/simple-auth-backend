@@ -36,7 +36,7 @@ export class CreateUserAddressParamsValidator implements IValidator {
 
     if (params.postal_code.length < 7) {
       return left(
-        new InvalidParamError('The param postal_code sent is not valid'),
+        new InvalidParamError('The param postal_code is not valid'),
       );
     }
 

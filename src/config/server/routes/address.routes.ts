@@ -17,7 +17,7 @@ const updateUserAddressController = expressRouterAdapter(
 
 const addressRoutes = Router();
 
-addressRoutes.post('/create', createUserAddressController);
-addressRoutes.put('/update', updateUserAddressController);
+addressRoutes.post('/create/:id', createUserAddressController);
+addressRoutes.put('/update/:id', updateUserAddressController);
 
 export { addressRoutes };

@@ -1,6 +1,5 @@
 import faker from 'faker';
 
-import { CreateUserDTO } from '@modules/accounts/dtos';
 import { UserRepositoryInMemory } from '@modules/accounts/repositories/in-memory';
 import { BcryptFacade } from '@shared/container/providers/hasher/implementations';
 import {
@@ -15,32 +14,29 @@ import {
 } from '@shared/errors/validator';
 import { badRequest, serverError } from '@shared/http';
 
-import { CreatUserUserCase, CreateUserController } from '.';
+import { CreatUserUseCase, CreateUserController } from '.';
 
 let bcryptFacade: BcryptFacade;
 let userParamsValidator: UserParamsValidator;
 let userRepository: UserRepositoryInMemory;
-let createUserUseCase: CreatUserUserCase;
+let createUserUseCase: CreatUserUseCase;
 let bodyRequestValidator: BodyRequestValidator;
 let createUserController: CreateUserController;
-let httpRequest: {
-  body: CreateUserDTO;
+
+const httpRequest = {
+  body: {
+    email: faker.internet.email(),
+    password: faker.internet.password(),
+    name: faker.internet.userName(),
+  },
 };
 describe('create user use case', () => {
   beforeEach(() => {
-    httpRequest = {
-      body: {
-        email: faker.internet.email(),
-        password: faker.internet.password(),
-        name: faker.internet.userName(),
-      },
-    };
-
     bcryptFacade = new BcryptFacade(2);
     userParamsValidator = new UserParamsValidator();
     userRepository = new UserRepositoryInMemory();
     bodyRequestValidator = new BodyRequestValidator();
-    createUserUseCase = new CreatUserUserCase(
+    createUserUseCase = new CreatUserUseCase(
       userRepository,
       userParamsValidator,
       bcryptFacade,

@@ -15,7 +15,7 @@ import {
   InvalidParamError,
   MissingParamError,
 } from '@shared/errors/validator';
-import { badRequest } from '@shared/http';
+import { badRequest, serverError } from '@shared/http';
 import { left, right } from '@shared/utils';
 
 import { CreateUserAddressController } from './create-user-address-controller';
@@ -43,7 +43,7 @@ const user_mock: CreateUserDTO = {
   name: 'any_name',
   password: 'any_password',
 };
-describe('Create user address', () => {
+describe('Create user address: unit', () => {
   beforeEach(() => {
     userAddressRepository = new UserAddressInMemoryRepository();
     userRepository = new UserRepositoryInMemory();
@@ -143,7 +143,7 @@ describe('Create user address', () => {
     expect(http_response).toEqual(badRequest(new UserNotFoundError()));
   });
 
-  it('should not accept a body request missing required params', async () => {
+  it('should not accept a body request missing requirers params', async () => {
     const invalid_Body = {
       city: 'any_city',
       state: 'any_state',
@@ -184,25 +184,6 @@ describe('Create user address', () => {
     expect(http_response).toEqual(badRequest(new UserAlreadyHaveAddress()));
   });
 
-  it('should not accept a empty string ', async () => {
-    const invalid_Body = {
-      city: 'any_city',
-      state: 'any_state',
-      district: '',
-      house_number: 1,
-      id_user: 'any_id_user',
-      postal_code: 'any_postal_code',
-    };
-
-    const http_response = await createUserAddressController.handle({
-      body: invalid_Body,
-    });
-
-    expect(http_response).toEqual(
-      badRequest(new MissingParamError('The filed(s): [district] is missing.')),
-    );
-  });
-
   it('should not accept a invalid postal_code', async () => {
     const invalid_Body = {
       ...user_address_mock,
@@ -220,7 +201,7 @@ describe('Create user address', () => {
     );
   });
 
-  it('should not accept a id_user with a invalid uuid format ', async () => {
+  it('should not accept a id_user with a invalid uuid format', async () => {
     const invalid_Body = {
       ...user_address_mock,
       id_user: 'any',
@@ -233,5 +214,16 @@ describe('Create user address', () => {
         new InvalidParamError('The id_user does not have a valid uuid format'),
       ),
     );
+  });
+
+  it('should returns a server error if createUserUseCase throws an error', async () => {
+    jest.spyOn(createUserAddressUseCase, 'execute').mockRejectedValueOnce(new Error());
+    const http_request = {
+      body: user_address_mock,
+    };
+
+    const http_response = await createUserAddressController.handle(http_request);
+
+    expect(http_response).toEqual(serverError());
   });
 });

@@ -1,6 +1,6 @@
 export class InternalServerError extends Error {
   constructor() {
-    super('Internal sever error');
+    super('Internal server error');
     this.name = 'InternalServerError';
   }
 }

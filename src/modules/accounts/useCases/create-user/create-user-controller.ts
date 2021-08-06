@@ -10,13 +10,13 @@ import {
 } from '@shared/http';
 import { IController } from '@shared/ports';
 
-import { CreatUserUserCase } from './create-user-useCase';
+import { CreatUserUseCase } from './create-user-useCase';
 
 @singleton()
 export class CreateUserController implements IController {
   constructor(
-    @inject('CreatUserUserCase')
-    private readonly createUserUseCase: CreatUserUserCase,
+    @inject('CreatUserUseCase')
+    private readonly createUserUseCase: CreatUserUseCase,
     @inject('BodyRequestValidator')
     private readonly bodyRequestValidator: IValidator,
   ) {}

@@ -14,7 +14,7 @@ export class AuthMiddleware implements IMiddleware {
 
     if (!authHeader) {
       return unauthorized({
-        error: 'token missing',
+        error: 'Token missing',
       });
     }
 
@@ -29,7 +29,7 @@ export class AuthMiddleware implements IMiddleware {
 
       return ok();
     } catch {
-      return unauthorized({ error: 'token invalid' });
+      return unauthorized({ error: 'Token invalid' });
     }
   }
 }

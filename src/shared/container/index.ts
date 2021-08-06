@@ -17,7 +17,7 @@ import {
 } from '@modules/accounts/repositories';
 import {
   UserAuthenticateUseCase,
-  CreatUserUserCase,
+  CreatUserUseCase,
   ResetPasswordUserUseCase,
   SendForgotPasswordEmailUseCase,
   SendVerifyEmailUseCase,
@@ -74,9 +74,9 @@ container.registerSingleton<UserAuthenticateUseCase>(
   UserAuthenticateUseCase,
 );
 
-container.registerSingleton<CreatUserUserCase>(
-  'CreatUserUserCase',
-  CreatUserUserCase,
+container.registerSingleton<CreatUserUseCase>(
+  'CreatUserUseCase',
+  CreatUserUseCase,
 );
 
 container.registerSingleton<ResetPasswordUserUseCase>(

@@ -11,6 +11,14 @@ import { Either, left, right } from '@shared/utils';
 
 import { UserAlreadyHaveAddress } from './errors';
 
+type Response = {
+  city: string;
+  district: string;
+  state: string;
+  house_number: number;
+  postal_code: string;
+};
+
 @injectable()
 export class CreateUserAddressUseCase {
   constructor(
@@ -29,9 +37,7 @@ export class CreateUserAddressUseCase {
     district,
     house_number,
     postal_code,
-  }: CreateUserAddressDTO): Promise<
-    Either<Error, CreateUserAddressDTO>
-  > {
+  }: CreateUserAddressDTO): Promise<Either<Error, Response>> {
     const haveAInvalidParam = this.validator.check({
       city,
       district,
@@ -59,7 +65,7 @@ export class CreateUserAddressUseCase {
       return left(new UserAlreadyHaveAddress());
     }
 
-    const address = await this.UserAddressRepository.save({
+    await this.UserAddressRepository.save({
       id_user,
       city,
       district,
@@ -68,6 +74,12 @@ export class CreateUserAddressUseCase {
       postal_code,
     });
 
-    return right(address);
+    return right({
+      city,
+      district,
+      house_number,
+      postal_code,
+      state,
+    });
   }
 }
