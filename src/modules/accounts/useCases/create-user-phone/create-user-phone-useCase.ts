@@ -11,6 +11,11 @@ import { Either, left, right } from '@shared/utils';
 
 import { UserAlreadyHavePhone } from './errors';
 
+type response = {
+  type: string;
+  phone_number: string;
+};
+
 @injectable()
 export class CreateUserPhoneUseCase {
   constructor(
@@ -26,9 +31,7 @@ export class CreateUserPhoneUseCase {
     id_user,
     phone_number,
     type,
-  }: CreateUserPhoneDTO): Promise<
-    Either<UserNotFoundError, CreateUserPhoneDTO>
-  > {
+  }: CreateUserPhoneDTO): Promise<Either<Error, response>> {
     const haveAInvalidParam = this.validator.check({
       id_user,
       phone_number,
@@ -53,12 +56,15 @@ export class CreateUserPhoneUseCase {
       return left(new UserAlreadyHavePhone());
     }
 
-    const result = await this.userPhoneRepository.save({
+    await this.userPhoneRepository.save({
       id_user,
       phone_number,
       type,
     });
 
-    return right(result);
+    return right({
+      phone_number,
+      type,
+    });
   }
 }

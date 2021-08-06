@@ -1,12 +1,11 @@
 import { inject, singleton } from 'tsyringe';
 
-import { CreateUserPhoneDTO } from '@modules/accounts/dtos';
 import { IValidator } from '@shared/container/providers';
 import {
   badRequest,
+  created,
   HttpRequest,
   HttpResponse,
-  ok,
   serverError,
 } from '@shared/http';
 import { IController } from '@shared/ports';
@@ -22,21 +21,23 @@ export class CreateUserPhoneController implements IController {
     private readonly bodyRequestValidator: IValidator,
   ) {}
 
-  async handle({ body }: HttpRequest): Promise<HttpResponse> {
+  async handle({ body, params }: HttpRequest): Promise<HttpResponse> {
     try {
       const haveBodyInvalidParams = this.bodyRequestValidator.check({
         body,
-        fields: ['id_user', 'type', 'phone_number'],
+        fields: ['type', 'phone_number'],
       });
 
       if (haveBodyInvalidParams.isLeft()) {
         return badRequest(haveBodyInvalidParams.value);
       }
 
-      const { id_user, phone_number, type } = body as CreateUserPhoneDTO;
+      const { id } = params;
+
+      const { phone_number, type } = body;
 
       const result = await this.createUserPhoneUseCase.execute({
-        id_user,
+        id_user: id,
         phone_number,
         type,
       });
@@ -45,7 +46,7 @@ export class CreateUserPhoneController implements IController {
         return badRequest(result.value);
       }
 
-      return ok(result.value);
+      return created(result.value);
     } catch (error) {
       return serverError();
     }

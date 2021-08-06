@@ -25,7 +25,15 @@ const updateUserPhoneController = expressRouterAdapter(
   container.resolve(UpdateUserPhoneController),
 );
 
-phoneRoutes.post('/create', authenticateMiddleware, createUserPhoneController);
-phoneRoutes.put('/update', authenticateMiddleware, updateUserPhoneController);
+phoneRoutes.post(
+  '/create/:id',
+  authenticateMiddleware,
+  createUserPhoneController,
+);
+phoneRoutes.put(
+  '/update/:id',
+  authenticateMiddleware,
+  updateUserPhoneController,
+);
 
 export { phoneRoutes };

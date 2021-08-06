@@ -30,8 +30,8 @@ const user_mock = {
   password: 'any_password',
 };
 
-const user_phone_mock: CreateUserPhoneDTO = {
-  id_user: faker.datatype.uuid(),
+const user_phone_mock = {
+  id_user: user_mock.id,
   phone_number: 'any_phone_number',
   type: 'any_type',
 };
@@ -84,7 +84,7 @@ describe('create or update user phone use case', () => {
 
     expect(checkSpy).toBeCalledWith({
       body: user_phone_mock,
-      fields: ['id_user', 'type', 'phone_number'],
+      fields: ['type', 'phone_number'],
     });
     expect(executeSpy).toBeCalledWith(user_phone_mock);
   });
@@ -104,7 +104,7 @@ describe('create or update user phone use case', () => {
     expect(http_response.body).toEqual(user_phone_mock);
   });
 
-  it('should should not accept a empty body request', async () => {
+  it('should not accept a empty body request', async () => {
     const http_response = await createUserPhoneController.handle({});
 
     expect(http_response).toEqual(badRequest(new EmptyBodyError()));
@@ -136,6 +136,18 @@ describe('create or update user phone use case', () => {
     expect(http_response).toEqual(badRequest(new UserAlreadyHavePhone()));
   });
 
+  it('should not accept a user with invalid phone number', async () => {
+    const http_request = {
+      body: {
+        ...user_phone_mock,
+        phone_number: '123',
+      },
+    };
+
+    const http_response = await createUserPhoneController.handle(http_request);
+
+    expect(http_response).toBe(200);
+  });
   it('should not accept a id_user with a invalid uuid format', async () => {
     const http_request = {
       body: {
