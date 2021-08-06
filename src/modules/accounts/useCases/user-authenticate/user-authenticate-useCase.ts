@@ -72,7 +72,6 @@ export class UserAuthenticateUseCase {
     const accessToken = await this.jwtProvider.createToken(
       {
         email,
-        password,
         id,
       },
       expires_in_token,
@@ -83,6 +82,7 @@ export class UserAuthenticateUseCase {
     const refreshToken = await this.jwtProvider.createToken(
       {
         id,
+        email,
       },
       expires_in_refresh_token,
       secret_refresh_token,

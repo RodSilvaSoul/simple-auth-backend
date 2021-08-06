@@ -29,7 +29,7 @@ let userRepository: UserRepositoryInMemory;
 let bodyRequestValidator: BodyRequestValidator;
 let createUserAddressParamsValidator: CreateUserAddressParamsValidator;
 
-const userAddressMock: CreateUserAddressDTO = {
+const user_address_mock: CreateUserAddressDTO = {
   city: 'any_city',
   state: 'any_state',
   district: 'any_district',
@@ -44,7 +44,7 @@ const user_mock: CreateUserDTO = {
   name: 'any_name',
   password: 'any_password',
 };
-describe('Create or update user address', () => {
+describe('Create user address', () => {
   beforeEach(() => {
     userAddressRepository = new UserAddressInMemoryRepository();
     userRepository = new UserRepositoryInMemory();
@@ -72,12 +72,12 @@ describe('Create or update user address', () => {
       .spyOn(userAddressRepository, 'findByUserId')
       .mockResolvedValueOnce(left(new Error()));
 
-    await createUserAddressUseCase.execute(userAddressMock);
+    await createUserAddressUseCase.execute(user_address_mock);
 
-    expect(checkSpy).toBeCalledWith(userAddressMock);
-    expect(findByIdSpy).toBeCalledWith(userAddressMock.id_user);
-    expect(findByUserIdSpy).toBeCalledWith(userAddressMock.id_user);
-    expect(saveSpy).toBeCalledWith(userAddressMock);
+    expect(checkSpy).toBeCalledWith(user_address_mock);
+    expect(findByIdSpy).toBeCalledWith(user_address_mock.id_user);
+    expect(findByUserIdSpy).toBeCalledWith(user_address_mock.id_user);
+    expect(saveSpy).toBeCalledWith(user_address_mock);
   });
 
   it('should createUserAddressController call your methods correctly', async () => {
@@ -85,7 +85,7 @@ describe('Create or update user address', () => {
     const executeSpy = jest.spyOn(createUserAddressUseCase, 'execute');
 
     const http_request = {
-      body: userAddressMock,
+      body: user_address_mock,
     };
 
     await createUserAddressController.handle(http_request);
@@ -102,7 +102,7 @@ describe('Create or update user address', () => {
       ],
     });
 
-    expect(executeSpy).toBeCalledWith(userAddressMock);
+    expect(executeSpy).toBeCalledWith(user_address_mock);
   });
 
   it('should create a new user address for a registered user', async () => {
@@ -115,7 +115,7 @@ describe('Create or update user address', () => {
       .mockResolvedValueOnce(left(new Error()));
 
     const http_request = {
-      body: userAddressMock,
+      body: user_address_mock,
     };
 
     const http_response = await createUserAddressController.handle(
@@ -123,7 +123,7 @@ describe('Create or update user address', () => {
     );
 
     expect(http_response.statusCode).toEqual(200);
-    expect(http_response.body).toEqual(userAddressMock);
+    expect(http_response.body).toEqual(user_address_mock);
   });
 
   it('should not accept a empty body request', async () => {
@@ -134,7 +134,7 @@ describe('Create or update user address', () => {
 
   it('should not create a new user address for a not registered user', async () => {
     const http_request = {
-      body: userAddressMock,
+      body: user_address_mock,
     };
 
     const http_response = await createUserAddressController.handle(
@@ -175,7 +175,7 @@ describe('Create or update user address', () => {
       .mockResolvedValueOnce(right({} as any));
 
     const http_request = {
-      body: userAddressMock,
+      body: user_address_mock,
     };
 
     const http_response = await createUserAddressController.handle(
@@ -206,7 +206,7 @@ describe('Create or update user address', () => {
 
   it('should not accept a invalid postal_code', async () => {
     const invalid_Body = {
-      ...userAddressMock,
+      ...user_address_mock,
       postal_code: 'any',
     };
 
@@ -223,7 +223,7 @@ describe('Create or update user address', () => {
 
   it('should not accept a id_user with a invalid uuid format ', async () => {
     const invalid_Body = {
-      ...userAddressMock,
+      ...user_address_mock,
       id_user: 'any',
     };
 

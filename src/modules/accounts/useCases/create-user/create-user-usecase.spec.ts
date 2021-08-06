@@ -26,7 +26,7 @@ let createUserController: CreateUserController;
 let httpRequest: {
   body: CreateUserDTO;
 };
-describe('create user', () => {
+describe('create user use case', () => {
   beforeEach(() => {
     httpRequest = {
       body: {

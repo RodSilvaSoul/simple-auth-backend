@@ -30,7 +30,7 @@ export class CreateUserAddressUseCase {
     house_number,
     postal_code,
   }: CreateUserAddressDTO): Promise<
-    Either<UserNotFoundError, CreateUserAddressDTO>
+    Either<Error, CreateUserAddressDTO>
   > {
     const haveAInvalidParam = this.validator.check({
       city,

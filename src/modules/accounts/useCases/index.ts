@@ -8,3 +8,4 @@ export * from './create-user-address';
 export * from './create-user-phone';
 export * from './update-user-address';
 export * from './update-user-phone';
+export * from './refresh-token';

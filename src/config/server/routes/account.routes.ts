@@ -12,6 +12,7 @@ import {
   CreateUserPhoneController,
   UpdateUserAddressController,
   UpdateUserPhoneController,
+  RefreshTokenController,
 } from '@modules/accounts/useCases';
 import {
   expressMiddlewareAdapter,
@@ -23,6 +24,8 @@ const createUserController = container.resolve(CreateUserController);
 const userAuthenticateController = container.resolve(
   UserAuthenticateController,
 );
+
+const refreshTokenController = container.resolve(RefreshTokenController);
 
 const sendForgotPasswordEmailController = container.resolve(
   SendForgotPasswordEmailController,
@@ -52,6 +55,7 @@ const expressAuthMiddleware = expressMiddlewareAdapter(authMiddleware);
 export default (router: Router) => {
   router.post('/sign', expressRouterAdapter(createUserController));
   router.post('/login', expressRouterAdapter(userAuthenticateController));
+  router.post('/refresh-token', expressRouterAdapter(refreshTokenController));
 
   router.post(
     '/password/forgot',

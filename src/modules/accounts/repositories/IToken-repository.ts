@@ -7,8 +7,10 @@ import { UserTokens } from '../infra/typorm/entities';
 export interface ITokenRepository {
   add(params: CreteUserTokenDTO): Promise<UserTokens>;
   findByUserId(userId: string): Promise<Either<NotFoundError, UserTokens>>;
-  findByToken(
-    token: string
-  ): Promise<Either<NotFoundError, UserTokens>>;
+  findByToken(token: string): Promise<Either<NotFoundError, UserTokens>>;
   deleteById(id: string): Promise<void>;
+  findByUserIdAndToken(
+    id_user: string,
+    token: string,
+  ): Promise<Either<NotFoundError, UserTokens>>;
 }

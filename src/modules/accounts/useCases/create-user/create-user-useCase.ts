@@ -14,7 +14,7 @@ class CreatUserUserCase {
     @inject('UserRepository')
     private readonly userRepository: IUserRepository,
     @inject('UserParamsValidator')
-    private readonly userParamsValidator: IValidator,
+    private readonly validator: IValidator,
     @inject('BcryptFacade')
     private readonly hasherProvider: IHasherProvider,
   ) {}
@@ -24,7 +24,7 @@ class CreatUserUserCase {
     name,
     password,
   }: CreateUserDTO): Promise<Either<EmailAlreadyUseError, true>> {
-    const haveAInvalidParam = this.userParamsValidator.check({
+    const haveAInvalidParam = this.validator.check({
       email,
       name,
       password,

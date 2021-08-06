@@ -16,14 +16,18 @@ export class TokenRepository implements ITokenRepository {
     this.repository = getRepository(UserTokens);
   }
 
-  add({ expires_in, id_user, token }: CreteUserTokenDTO): Promise<UserTokens> {
+  async add({
+    expires_in,
+    id_user,
+    token,
+  }: CreteUserTokenDTO): Promise<UserTokens> {
     const refreshToken = this.repository.create({
       expires_in,
       id_user,
       token,
     });
 
-    const queryResult = this.repository.save(refreshToken);
+    const queryResult = await this.repository.save(refreshToken);
 
     return queryResult;
   }
@@ -43,9 +47,7 @@ export class TokenRepository implements ITokenRepository {
     return left(new NotFoundError(userId));
   }
 
-  async findByToken(
-    token: string,
-  ): Promise<Either<NotFoundError, UserTokens>> {
+  async findByToken(token: string): Promise<Either<NotFoundError, UserTokens>> {
     const queryResult = await this.repository.findOne({
       where: {
         token,
@@ -61,5 +63,23 @@ export class TokenRepository implements ITokenRepository {
 
   async deleteById(id: string): Promise<void> {
     await this.repository.delete({ id });
+  }
+
+  async findByUserIdAndToken(
+    id_user: string,
+    token: string,
+  ): Promise<Either<NotFoundError, UserTokens>> {
+    const tokenData = await this.repository.findOne({
+      where: {
+        id_user,
+        token,
+      },
+    });
+
+    if (!tokenData) {
+      return left(new NotFoundError(id_user));
+    }
+
+    return right(tokenData);
   }
 }

@@ -1,7 +1,12 @@
-import { CreateUserAddressDTO } from '@modules/accounts/dtos';
+import {
+  CreateUserAddressDTO,
+  UpdateUserAddressDTO,
+} from '@modules/accounts/dtos';
 import { UserAddress } from '@modules/accounts/infra/typorm/entities';
-import { NotFoundError } from '@shared/errors/database-query';
-import { Either, left, right } from '@shared/utils';
+import { ErrorOnUpdate, NotFoundError } from '@shared/errors/database-query';
+import {
+  Either, filterAvailableParams, left, right,
+} from '@shared/utils';
 
 import { IUserAddressRepository } from '..';
 
@@ -30,5 +35,31 @@ export class UserAddressInMemoryRepository implements IUserAddressRepository {
     }
 
     return right(userExists);
+  }
+
+  async update({
+    id_user,
+    ...rest
+  }: UpdateUserAddressDTO): Promise<Either<ErrorOnUpdate, true>> {
+    const phoneUser = this.address.find((address) => address.id_user === id_user);
+
+    if (phoneUser) {
+      return left(new ErrorOnUpdate());
+    }
+
+    const data = filterAvailableParams(
+      ['house_number', 'city', 'district', 'state', 'postal_code'],
+      rest,
+    );
+
+    const newData = Object.assign(phoneUser, data);
+
+    const index = this.address.findIndex(
+      (address) => address.id_user === id_user,
+    );
+
+    this.address[index] = newData;
+
+    return right(true);
   }
 }
