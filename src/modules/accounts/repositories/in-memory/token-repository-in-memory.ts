@@ -40,7 +40,7 @@ export class TokenRepositoryInMemory implements ITokenRepository {
   }
   async findByToken(token: string): Promise<Either<NotFoundError, UserTokens>> {
     const refreshToken = this.refreshTokens.find(
-      (refeshToken) => refeshToken.token === token,
+      (refreshToken) => refreshToken.token === token,
     );
 
     if (refreshToken) {
@@ -53,5 +53,20 @@ export class TokenRepositoryInMemory implements ITokenRepository {
     const refreshTokens = this.refreshTokens.filter((token) => token.id !== id);
 
     this.refreshTokens = refreshTokens;
+  }
+
+  async findByUserIdAndToken(
+    id_user: string,
+    token: string,
+  ): Promise<Either<NotFoundError, UserTokens>> {
+    const tokenData = this.refreshTokens.find(
+      (data) => data.id === id_user && data.token === token,
+    );
+
+    if (!tokenData) {
+      return left(new NotFoundError(id_user));
+    }
+
+    return right(tokenData);
   }
 }

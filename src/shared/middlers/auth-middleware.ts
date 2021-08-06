@@ -1,4 +1,5 @@
 import { verify } from 'jsonwebtoken';
+import { singleton } from 'tsyringe';
 
 import auth from '@config/auth';
 import {
@@ -6,6 +7,7 @@ import {
 } from '@shared/http';
 import { IMiddleware } from '@shared/ports/middleware';
 
+@singleton()
 export class AuthMiddleware implements IMiddleware {
   async handle(req: HttpRequest): Promise<HttpResponse> {
     const authHeader = req.headers.authorization as string;

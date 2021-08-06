@@ -1,7 +1,10 @@
-import { CreateUserPhoneDTO } from '@modules/accounts/dtos';
+import { CreateUserPhoneDTO, UpdateUserPhoneDTO } from '@modules/accounts/dtos';
 import { UserPhone } from '@modules/accounts/infra/typorm/entities';
+import { ErrorOnUpdate } from '@shared/errors/database-query';
 import { UserNotFoundError } from '@shared/errors/useCase';
-import { Either, left, right } from '@shared/utils';
+import {
+  Either, filterAvailableParams, left, right,
+} from '@shared/utils';
 
 import { IUserPhoneRepository } from '../IUser-phone-repository';
 
@@ -29,5 +32,26 @@ export class UserPhoneInMemory implements IUserPhoneRepository {
     }
 
     return right(userExists as any);
+  }
+
+  async update({
+    id_user,
+    ...rest
+  }: UpdateUserPhoneDTO): Promise<Either<ErrorOnUpdate, UpdateUserPhoneDTO>> {
+    const userPhone = this.userPhones.find((phone) => phone.id === id_user);
+
+    if (userPhone) {
+      return left(new ErrorOnUpdate());
+    }
+
+    const data = filterAvailableParams(['type', 'phone_number'], rest);
+
+    const newData = Object.assign(userPhone, data);
+
+    const index = this.userPhones.findIndex((phone) => phone.id === id_user);
+
+    this.userPhones[index] = newData;
+
+    return right(newData);
   }
 }
