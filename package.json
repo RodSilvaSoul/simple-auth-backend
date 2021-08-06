@@ -7,6 +7,8 @@
     "typeorm": "node --require ts-node/register ./node_modules/typeorm/cli.js",
     "dev": "ts-node-dev -r tsconfig-paths/register --inspect=0.0.0.0:9229 --transpile-only --ignore-watch node_modules --respawn src/server.ts",
     "test": "jest --runInBand",
+    "test:unit": "jest --runInBand -c ./jest-unit.config.ts",
+    "test:integration": "jest --runInBand -c ./jest-integration.config.ts",
     "start": "node ./dist/server.js"
   },
   "devDependencies": {

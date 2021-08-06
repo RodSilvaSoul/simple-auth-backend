@@ -93,10 +93,6 @@ describe('create user use case', () => {
 
     expect(httpResponse.body).toBeUndefined();
     expect(httpResponse.statusCode).toBe(201);
-
-    const newUser = await userRepository.findByEmail(httpRequest.body.email);
-
-    expect(newUser.isRight()).toBe(true);
   });
 
   it('should not accept a empty body request', async () => {
