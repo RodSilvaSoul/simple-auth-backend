@@ -38,9 +38,9 @@ export class UserPhoneInMemory implements IUserPhoneRepository {
     id_user,
     ...rest
   }: UpdateUserPhoneDTO): Promise<Either<ErrorOnUpdate, UpdateUserPhoneDTO>> {
-    const userPhone = this.userPhones.find((phone) => phone.id === id_user);
+    const userPhone = this.userPhones.find((phone) => phone.id_user === id_user);
 
-    if (userPhone) {
+    if (!userPhone) {
       return left(new ErrorOnUpdate());
     }
 
@@ -48,7 +48,7 @@ export class UserPhoneInMemory implements IUserPhoneRepository {
 
     const newData = Object.assign(userPhone, data);
 
-    const index = this.userPhones.findIndex((phone) => phone.id === id_user);
+    const index = this.userPhones.findIndex((phone) => phone.id_user === id_user);
 
     this.userPhones[index] = newData;
 

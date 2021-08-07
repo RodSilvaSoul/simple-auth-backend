@@ -65,7 +65,7 @@ describe('Create user address: unit', () => {
       bodyRequestValidator,
     );
   });
-  it('should createUserAddressUseCase call your methods correctly', async () => {
+  it('should updateUserAddressUseCase call your methods correctly', async () => {
     await userAddressRepository.save({
       ...user_address_mock,
     });
@@ -171,7 +171,7 @@ describe('Create user address: unit', () => {
     );
   });
 
-  it('should returns a server error if createUserUseCase throws an error', async () => {
+  it('should returns a server error if updateUserAddressUseCase throws an error', async () => {
     jest
       .spyOn(updateUserAddressUseCase, 'execute')
       .mockRejectedValueOnce(new Error());
