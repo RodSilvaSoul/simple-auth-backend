@@ -11,7 +11,6 @@ import {
 import { UserNotFoundError } from '@shared/errors/useCase';
 import { EmptyBodyError, InvalidParamError } from '@shared/errors/validator';
 import { badRequest, serverError } from '@shared/http';
-import { right } from '@shared/utils';
 
 import { CreateUserPhoneController, CreateUserPhoneUseCase } from '.';
 import { UserAlreadyHavePhone } from './errors';
@@ -98,6 +97,7 @@ describe('create user phone : unit', () => {
     await userRepository.add({
       ...user_mock,
     });
+
     const http_response = await createUserPhoneController.handle(http_request);
 
     const result_data = {
@@ -121,12 +121,13 @@ describe('create user phone : unit', () => {
   });
 
   it('should not create a user phone if the user already have one', async () => {
-    jest
-      .spyOn(userRepository, 'findById')
-      .mockResolvedValueOnce(right(user_mock as any));
-    jest
-      .spyOn(userPhoneRepository, 'findByUserId')
-      .mockResolvedValueOnce(right({} as any));
+    await userRepository.add({
+      ...user_mock,
+    });
+
+    await userPhoneRepository.save({
+      ...user_phone_mock,
+    });
 
     const http_response = await createUserPhoneController.handle(http_request);
 

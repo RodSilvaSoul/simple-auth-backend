@@ -21,6 +21,29 @@ let bcryptFacade: BcryptFacade;
 let dayjsFacade: DayjsFacade;
 let tokenRepository: TokenRepositoryInMemory;
 
+const user_mock = {
+  id: faker.datatype.uuid(),
+  email: 'any_email',
+  password: 'any_password',
+  name: 'any_name',
+};
+
+const user_token_mock = {
+  id: faker.datatype.uuid(),
+  token: 'any_token',
+  id_user: user_mock.id,
+  expires_in: faker.date.future(),
+};
+
+const http_request = {
+  body: {
+    password: 'any_password123',
+  },
+  query: {
+    token: 'any_token',
+  },
+};
+
 describe('Reset password user', () => {
   beforeEach(() => {
     bcryptFacade = new BcryptFacade(2);
@@ -42,31 +65,14 @@ describe('Reset password user', () => {
   });
 
   it('should resetPasswordUserUseCase call your methods correctly ', async () => {
-    const token = faker.datatype.uuid();
-    const id_user = faker.datatype.uuid();
-    const id_token = faker.datatype.uuid();
-    const password = faker.internet.password();
-    const expires_in = faker.date.future();
     const recent_date = faker.date.recent();
-    const user = {} as any;
 
-    tokenRepository.refreshTokens.push({
-      id: id_token,
-      id_user,
-      expires_in,
-      token,
-      created_at: faker.date.recent(),
-      user,
+    await userRepository.add({
+      ...user_mock,
     });
-    userRepository.users.push({
-      id: id_user,
-      avatar_url: 'any_url',
-      created_at: faker.date.soon(),
-      updated_at: faker.date.soon(),
-      email: faker.internet.email(),
-      name: faker.internet.userName(),
-      password: faker.internet.password(),
-      isVerified: true,
+
+    await tokenRepository.add({
+      ...user_token_mock,
     });
 
     const findByTokenSpy = jest.spyOn(tokenRepository, 'findByToken');
@@ -82,150 +88,77 @@ describe('Reset password user', () => {
     const deleteByIdSpy = jest.spyOn(tokenRepository, 'deleteById');
 
     await resetPasswordUserUseCase.execute({
-      token,
-      password,
+      token: 'any_token',
+      password: 'any_password123',
     });
 
-    expect(findByTokenSpy).toBeCalledWith(token);
+    expect(findByTokenSpy).toBeCalledWith('any_token');
     expect(dateNowSpy).toBeCalled();
-    expect(compareIfBeforeSpy).toBeCalledWith(expires_in, recent_date);
-    expect(findByIdSpy).toBeCalledWith(id_user);
-    expect(hashSpy).toBeCalledWith(password);
+    expect(compareIfBeforeSpy).toBeCalledWith(user_token_mock.expires_in, recent_date);
+    expect(findByIdSpy).toBeCalledWith(user_token_mock.id_user);
+    expect(hashSpy).toBeCalledWith('any_password123');
     expect(addSpy).toBeCalledWith(
       expect.objectContaining({
         password: 'any_hash',
       }),
     );
-    expect(deleteByIdSpy).toBeCalledWith(id_token);
+    expect(deleteByIdSpy).toBeCalledWith(user_token_mock.id);
   });
 
   it('should resetPasswordUserController call your methods correctly', async () => {
-    const password = faker.internet.password();
-    const token = faker.datatype.uuid();
-    const request_body = {
-      body: {
-        password,
-      },
-      query: {
-        token,
-      },
-    };
-
     const checkSpy = jest.spyOn(bodyRequestValidator, 'check');
     const executeSpy = jest.spyOn(resetPasswordUserUseCase, 'execute');
 
-    await resetPasswordUserController.handle(request_body);
+    await resetPasswordUserController.handle(http_request);
 
     expect(checkSpy).toBeCalledWith({
-      body: request_body.body,
+      body: http_request.body,
       fields: ['password'],
     });
 
     expect(executeSpy).toBeCalledWith({
-      token,
-      password,
+      token: 'any_token',
+      password: 'any_password123',
     });
   });
 
   it('should reset a password user if the reset password token is valid', async () => {
-    const token = faker.datatype.uuid();
-    const id_user = faker.datatype.uuid();
-
     await tokenRepository.add({
-      token,
-      expires_in: faker.date.future(),
-      id_user,
+      ...user_token_mock,
     });
 
-    const old_password = faker.internet.password();
-
-    userRepository.users.push({
-      id: id_user,
-      avatar_url: 'any_url',
-      created_at: faker.date.soon(),
-      updated_at: faker.date.soon(),
-      email: faker.internet.email(),
-      name: faker.internet.userName(),
-      password: old_password,
-      isVerified: true,
+    await userRepository.add({
+      ...user_mock,
     });
 
-    const request_body = {
-      body: {
-        password: faker.internet.password(),
-      },
-      query: {
-        token,
-      },
-    };
-
-    const httpResponse = await resetPasswordUserController.handle(request_body);
+    const httpResponse = await resetPasswordUserController.handle(http_request);
 
     expect(httpResponse.statusCode).toBe(200);
-
-    const user = userRepository.users.find((user) => user.id === id_user);
-
-    expect(user).toBeTruthy();
-    expect(user.password).not.toBe(old_password);
-
-    const shouldBeDeleted = await tokenRepository.findByUserId(id_user);
-
-    expect(shouldBeDeleted.isLeft()).toBe(true);
   });
 
   it('should not accept a token that is not registered', async () => {
-    const request_body = {
-      body: {
-        password: faker.internet.password(),
-      },
-      query: {
-        token: faker.datatype.uuid(),
-      },
-    };
-
-    const httpResponse = await resetPasswordUserController.handle(request_body);
+    const httpResponse = await resetPasswordUserController.handle(http_request);
 
     expect(httpResponse).toEqual(unauthorized(new InvalidTokenError()));
   });
 
   it('should not accept a token that is expired', async () => {
-    const token = faker.datatype.uuid();
-
     await tokenRepository.add({
-      token,
+      ...user_token_mock,
       expires_in: faker.date.past(),
-      id_user: faker.datatype.uuid(),
     });
 
-    const request_body = {
-      body: {
-        password: faker.internet.password(),
-      },
-      query: {
-        token,
-      },
-    };
-
-    const httpResponse = await resetPasswordUserController.handle(request_body);
+    const httpResponse = await resetPasswordUserController.handle(http_request);
 
     expect(httpResponse).toEqual(unauthorized(new InvalidTokenError()));
   });
 
   it('should returns a server error if resetPasswordUserUseCase.execute() throws an error', async () => {
-    const request_body = {
-      body: {
-        password: faker.internet.password(),
-      },
-      query: {
-        token: faker.datatype.uuid(),
-      },
-    };
-
     jest
       .spyOn(resetPasswordUserUseCase, 'execute')
       .mockRejectedValueOnce(new Error());
 
-    const httpResponse = await resetPasswordUserController.handle(request_body);
+    const httpResponse = await resetPasswordUserController.handle(http_request);
 
     expect(httpResponse).toEqual(serverError());
   });
