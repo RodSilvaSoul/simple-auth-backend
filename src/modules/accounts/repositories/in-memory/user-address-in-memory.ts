@@ -30,7 +30,7 @@ export class UserAddressInMemoryRepository implements IUserAddressRepository {
       (address) => address.id_user === userId,
     );
 
-    if (userExists) {
+    if (!userExists) {
       return left(new NotFoundError(userId));
     }
 
@@ -43,7 +43,7 @@ export class UserAddressInMemoryRepository implements IUserAddressRepository {
   }: UpdateUserAddressDTO): Promise<Either<ErrorOnUpdate, true>> {
     const phoneUser = this.address.find((address) => address.id_user === id_user);
 
-    if (phoneUser) {
+    if (!phoneUser) {
       return left(new ErrorOnUpdate());
     }
 

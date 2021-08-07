@@ -143,7 +143,9 @@ describe('Create user address: unit', () => {
 
     const http_response = await createUserAddressController.handle({
       body: invalid_Body,
-      params: user_address_mock.id_user,
+      params: {
+        id: user_address_mock.id_user,
+      },
     });
 
     expect(http_response).toEqual(
