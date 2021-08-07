@@ -1,4 +1,5 @@
 export type CreateUserAddressDTO = {
+  id?: string;
   id_user: string;
   city: string;
   district: string;

@@ -9,6 +9,7 @@ export class TokenRepositoryInMemory implements ITokenRepository {
   refreshTokens: UserTokens[] = [];
 
   async add({
+    id,
     expires_in,
     id_user,
     token,
@@ -16,6 +17,7 @@ export class TokenRepositoryInMemory implements ITokenRepository {
     const refreshToken = new UserTokens();
 
     Object.assign(refreshToken, {
+      id,
       expires_in,
       id_user,
       token,
@@ -60,7 +62,7 @@ export class TokenRepositoryInMemory implements ITokenRepository {
     token: string,
   ): Promise<Either<NotFoundError, UserTokens>> {
     const tokenData = this.refreshTokens.find(
-      (data) => data.id === id_user && data.token === token,
+      (data) => data.id_user === id_user && data.token === token,
     );
 
     if (!tokenData) {
