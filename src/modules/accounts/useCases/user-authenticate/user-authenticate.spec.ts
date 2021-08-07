@@ -9,11 +9,7 @@ import { BcryptFacade } from '@shared/container/providers/hasher/implementations
 import { JwtFacade } from '@shared/container/providers/jwt/implementations';
 import { BodyRequestValidator } from '@shared/container/providers/validator/implementations';
 import { EmptyBodyError, MissingParamError } from '@shared/errors/validator';
-import {
-  badRequest,
-  serverError,
-  unauthorized,
-} from '@shared/http';
+import { badRequest, serverError, unauthorized } from '@shared/http';
 
 import { EmailOrPasswordInvalid } from './errors';
 import { UserAuthenticateController } from './user-authenticate-controller';
@@ -28,7 +24,21 @@ let bcryptFacade: BcryptFacade;
 let dayjsFacade: DayjsFacade;
 let bodyRequestValidator: BodyRequestValidator;
 
-describe('user authenticate', () => {
+const user_mock = {
+  id: faker.datatype.uuid(),
+  name: 'any_name',
+  password: 'any_password123',
+  email: 'any_email',
+};
+
+const http_request = {
+  body: {
+    email: 'any_email',
+    password: 'any_password123',
+  },
+};
+
+describe('user authenticate: unit', () => {
   beforeEach(async () => {
     tokenRepository = new TokenRepositoryInMemory();
     userRepository = new UserRepositoryInMemory();
@@ -51,14 +61,12 @@ describe('user authenticate', () => {
     );
   });
   it('should userAuthenticateUseCase call your methods correctly', async () => {
-    const password = faker.internet.password();
-    const email = faker.internet.email();
+    const password = 'any_password123';
+    const email = 'any_email';
     const expires_in = faker.date.future();
 
     await userRepository.add({
-      name: faker.internet.userName(),
-      email,
-      password,
+      ...user_mock,
     });
 
     const findByEmailSpy = jest.spyOn(userRepository, 'findByEmail');
@@ -91,47 +99,29 @@ describe('user authenticate', () => {
   });
 
   it('should userAuthenticateController call your methods correctly', async () => {
-    const request_body = {
-      body: {
-        email: faker.internet.email(),
-        password: faker.internet.password(),
-      },
-    };
-
     const checkSpy = jest.spyOn(bodyRequestValidator, 'check');
     const executeSpy = jest.spyOn(userAuthenticateUseCase, 'execute');
 
-    await userAuthenticateController.handle(request_body);
+    await userAuthenticateController.handle(http_request);
 
     expect(checkSpy).toBeCalledWith({
-      body: request_body.body,
+      body: http_request.body,
       fields: ['password', 'email'],
     });
 
-    expect(executeSpy).toBeCalledWith(request_body.body);
+    expect(executeSpy).toBeCalledWith(http_request.body);
   });
   it('should authenticate a registered user', async () => {
-    const password = faker.internet.password();
-    const passwordHash = await bcryptFacade.hash(password);
+    const passwordHash = await bcryptFacade.hash(user_mock.password);
 
-    const user_db = {
-      name: faker.internet.userName(),
-      email: faker.internet.email(),
+    const { id } = await userRepository.add({
+      ...user_mock,
       password: passwordHash,
-    };
+    });
 
-    const request_body = {
-      body: {
-        ...user_db,
-        password,
-      },
-    };
+    const httpResponse = await userAuthenticateController.handle(http_request);
 
-    const { id } = await userRepository.add(user_db);
-
-    const httpResponse = await userAuthenticateController.handle(request_body);
-
-    const { email, name } = user_db;
+    const { email, name } = user_mock;
 
     expect(httpResponse.statusCode).toBe(200);
 
@@ -154,12 +144,11 @@ describe('user authenticate', () => {
     const passwordHash = await bcryptFacade.hash(password);
 
     const user_db = {
-      name: faker.internet.userName(),
-      email: faker.internet.email(),
+      ...user_mock,
       password: passwordHash,
     };
 
-    const request_body = {
+    const http_request = {
       body: {
         ...user_db,
         password,
@@ -170,7 +159,7 @@ describe('user authenticate', () => {
 
     const httpResponse = await userAuthenticateController.handle({
       body: {
-        ...request_body.body,
+        ...http_request.body,
         password: '123',
       },
     });
@@ -185,12 +174,12 @@ describe('user authenticate', () => {
   });
 
   it('should not accept a body request missing a required fields', async () => {
-    const request_body = {
+    const http_request = {
       body: {
-        email: faker.internet.email(),
+        email: 'any_email',
       },
     };
-    const httpResponse = await userAuthenticateController.handle(request_body);
+    const httpResponse = await userAuthenticateController.handle(http_request);
 
     expect(httpResponse).toEqual(
       badRequest(new MissingParamError('The filed(s): [password] is missing.')),
@@ -198,18 +187,11 @@ describe('user authenticate', () => {
   });
 
   it('should returns a server error if userAuthenticateUseCase.execute() throws an error', async () => {
-    const request_body = {
-      body: {
-        email: faker.internet.email(),
-        password: faker.internet.password(),
-      },
-    };
-
     jest
       .spyOn(userAuthenticateUseCase, 'execute')
       .mockRejectedValueOnce(new Error());
 
-    const httpResponse = await userAuthenticateController.handle(request_body);
+    const httpResponse = await userAuthenticateController.handle(http_request);
 
     expect(httpResponse).toEqual(serverError());
   });
