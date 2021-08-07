@@ -30,7 +30,7 @@ const httpRequest = {
     name: faker.internet.userName(),
   },
 };
-describe('create user use case', () => {
+describe('create user: unit', () => {
   beforeEach(() => {
     bcryptFacade = new BcryptFacade(2);
     userParamsValidator = new UserParamsValidator();
@@ -98,8 +98,12 @@ describe('create user use case', () => {
   });
 
   it('should not accept a body request missing a required field', async () => {
-    delete httpRequest.body.password;
-    const httpResponse = await createUserController.handle(httpRequest);
+    const httpResponse = await createUserController.handle({
+      body: {
+        ...httpRequest.body,
+        password: '',
+      },
+    });
 
     expect(httpResponse).toEqual(
       badRequest(new MissingParamError('The filed(s): [password] is missing.')),

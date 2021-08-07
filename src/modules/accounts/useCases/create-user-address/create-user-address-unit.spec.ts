@@ -1,6 +1,5 @@
 import faker from 'faker';
 
-import { CreateUserAddressDTO, CreateUserDTO } from '@modules/accounts/dtos';
 import {
   UserAddressInMemoryRepository,
   UserRepositoryInMemory,
@@ -29,7 +28,7 @@ let userRepository: UserRepositoryInMemory;
 let bodyRequestValidator: BodyRequestValidator;
 let createUserAddressParamsValidator: CreateUserAddressParamsValidator;
 
-const user_address_mock: CreateUserAddressDTO = {
+const user_address_mock = {
   city: 'any_city',
   state: 'any_state',
   district: 'any_district',
@@ -38,10 +37,17 @@ const user_address_mock: CreateUserAddressDTO = {
   postal_code: 'any_postal_code',
 };
 
-const user_mock: CreateUserDTO = {
+const user_mock = {
   email: 'any_email',
   name: 'any_name',
   password: 'any_password',
+};
+
+const http_request = {
+  body: user_address_mock,
+  params: {
+    id: user_address_mock.id_user,
+  },
 };
 describe('Create user address: unit', () => {
   beforeEach(() => {
@@ -83,22 +89,11 @@ describe('Create user address: unit', () => {
     const checkSpy = jest.spyOn(bodyRequestValidator, 'check');
     const executeSpy = jest.spyOn(createUserAddressUseCase, 'execute');
 
-    const http_request = {
-      body: user_address_mock,
-    };
-
     await createUserAddressController.handle(http_request);
 
     expect(checkSpy).toBeCalledWith({
       body: http_request.body,
-      fields: [
-        'city',
-        'state',
-        'house_number',
-        'id_user',
-        'postal_code',
-        'district',
-      ],
+      fields: ['city', 'state', 'house_number', 'postal_code', 'district'],
     });
 
     expect(executeSpy).toBeCalledWith(user_address_mock);
@@ -113,16 +108,15 @@ describe('Create user address: unit', () => {
       .spyOn(userAddressRepository, 'findByUserId')
       .mockResolvedValueOnce(left(new Error()));
 
-    const http_request = {
-      body: user_address_mock,
-    };
-
     const http_response = await createUserAddressController.handle(
       http_request,
     );
 
-    expect(http_response.statusCode).toEqual(200);
-    expect(http_response.body).toEqual(user_address_mock);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { id_user, ...rest } = user_address_mock;
+
+    expect(http_response.statusCode).toEqual(201);
+    expect(http_response.body).toEqual(rest);
   });
 
   it('should not accept a empty body request', async () => {
@@ -132,10 +126,6 @@ describe('Create user address: unit', () => {
   });
 
   it('should not create a new user address for a not registered user', async () => {
-    const http_request = {
-      body: user_address_mock,
-    };
-
     const http_response = await createUserAddressController.handle(
       http_request,
     );
@@ -153,13 +143,12 @@ describe('Create user address: unit', () => {
 
     const http_response = await createUserAddressController.handle({
       body: invalid_Body,
+      params: user_address_mock.id_user,
     });
 
     expect(http_response).toEqual(
       badRequest(
-        new MissingParamError(
-          'The filed(s): [id_user,postal_code] is missing.',
-        ),
+        new MissingParamError('The filed(s): [postal_code] is missing.'),
       ),
     );
   });
@@ -172,10 +161,6 @@ describe('Create user address: unit', () => {
     jest
       .spyOn(userAddressRepository, 'findByUserId')
       .mockResolvedValueOnce(right({} as any));
-
-    const http_request = {
-      body: user_address_mock,
-    };
 
     const http_response = await createUserAddressController.handle(
       http_request,
@@ -192,11 +177,14 @@ describe('Create user address: unit', () => {
 
     const http_response = await createUserAddressController.handle({
       body: invalid_Body,
+      params: {
+        id: user_address_mock.id_user,
+      },
     });
 
     expect(http_response).toEqual(
       badRequest(
-        new InvalidParamError('The param postal_code sent is not valid'),
+        new InvalidParamError('The param postal_code is not valid'),
       ),
     );
   });
@@ -207,7 +195,10 @@ describe('Create user address: unit', () => {
       id_user: 'any',
     };
 
-    const http_response = await createUserAddressController.handle({ body: invalid_Body });
+    const http_response = await createUserAddressController.handle({
+      body: invalid_Body,
+      params: user_address_mock.id_user,
+    });
 
     expect(http_response).toEqual(
       badRequest(
@@ -217,12 +208,13 @@ describe('Create user address: unit', () => {
   });
 
   it('should returns a server error if createUserUseCase throws an error', async () => {
-    jest.spyOn(createUserAddressUseCase, 'execute').mockRejectedValueOnce(new Error());
-    const http_request = {
-      body: user_address_mock,
-    };
+    jest
+      .spyOn(createUserAddressUseCase, 'execute')
+      .mockRejectedValueOnce(new Error());
 
-    const http_response = await createUserAddressController.handle(http_request);
+    const http_response = await createUserAddressController.handle(
+      http_request,
+    );
 
     expect(http_response).toEqual(serverError());
   });
