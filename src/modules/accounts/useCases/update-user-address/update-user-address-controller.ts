@@ -1,6 +1,5 @@
 import { singleton, inject } from 'tsyringe';
 
-import { UpdateUserAddressDTO } from '@modules/accounts/dtos';
 import { IValidator } from '@shared/container/providers';
 import {
   badRequest,
@@ -22,26 +21,28 @@ export class UpdateUserAddressController implements IController {
     private readonly validator: IValidator,
   ) {}
 
-  async handle({ body }: HttpRequest): Promise<HttpResponse> {
+  async handle({ body, params }: HttpRequest): Promise<HttpResponse> {
     try {
       const haveBodyInvalidParams = this.validator.check({
         body,
-        fields: ['id_user'],
+        fields: [],
       });
 
       if (haveBodyInvalidParams.isLeft()) {
-        badRequest(haveBodyInvalidParams.value);
+        return badRequest(haveBodyInvalidParams.value);
       }
 
+      const { id } = params;
+
       const {
-        city, district, house_number, id_user, postal_code, state,
-      } = body as UpdateUserAddressDTO;
+        city, district, house_number, postal_code, state,
+      } = body;
 
       const result = await this.updateUserAddressUseCase.execute({
         city,
         district,
         house_number,
-        id_user,
+        id_user: id,
         postal_code,
         state,
       });

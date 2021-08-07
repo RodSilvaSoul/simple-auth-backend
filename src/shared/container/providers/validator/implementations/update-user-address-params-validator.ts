@@ -62,7 +62,7 @@ export class UpdateUserAddressParamsValidator implements IValidator {
 
     if (rest?.postal_code?.length < 7) {
       return left(
-        new InvalidParamError('The param postal_code sent is not valid'),
+        new InvalidParamError('The param postal_code is not valid'),
       );
     }
 
