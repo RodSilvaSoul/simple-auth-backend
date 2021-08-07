@@ -29,7 +29,20 @@ let emailProvider: EmailProviderInMemory;
 let bodyRequestValidator: BodyRequestValidator;
 let uuidProvider: UuidFacade;
 
-describe('send verify email', () => {
+const user_mock = {
+  id: faker.datatype.uuid(),
+  name: 'any_email',
+  password: 'any_password',
+  email: 'any_email',
+};
+
+const http_request = {
+  body: {
+    email: 'any_email',
+  },
+};
+
+describe('send verify email: unit', () => {
   beforeEach(() => {
     emailProvider = new EmailProviderInMemory();
     bodyRequestValidator = new BodyRequestValidator();
@@ -52,18 +65,11 @@ describe('send verify email', () => {
   });
 
   it('should SendVerifyEmailUseCase call your methods correctly', async () => {
-    const email = faker.internet.email();
+    const email = 'any_email';
     const expires_in = faker.date.future();
 
-    userRepository.users.push({
-      id: faker.datatype.uuid(),
-      avatar_url: 'any_url',
-      created_at: faker.date.soon(),
-      updated_at: faker.date.soon(),
-      email,
-      name: faker.internet.userName(),
-      password: faker.internet.password(),
-      isVerified: true,
+    await userRepository.add({
+      ...user_mock,
     });
 
     const findByEmailSpy = jest.spyOn(userRepository, 'findByEmail');
@@ -94,57 +100,30 @@ describe('send verify email', () => {
   });
 
   it('should sendVerifyEmailController call your methods correctly', async () => {
-    const body_request = {
-      body: {
-        email: faker.internet.email(),
-      },
-    };
-
     const checkSpy = jest.spyOn(bodyRequestValidator, 'check');
     const executeSpy = jest.spyOn(sendVerifyEmailUseCase, 'execute');
 
-    await sendVerifyEmailController.handle(body_request);
+    await sendVerifyEmailController.handle(http_request);
 
     expect(checkSpy).toBeCalledWith({
-      body: body_request.body,
+      body: http_request.body,
       fields: ['email'],
     });
 
-    expect(executeSpy).toBeCalledWith(body_request.body.email);
+    expect(executeSpy).toBeCalledWith(http_request.body.email);
   });
   it('should send a verify email if the user is registered ', async () => {
-    const email = faker.internet.email();
-
-    userRepository.users.push({
-      id: faker.datatype.uuid(),
-      avatar_url: 'any_url',
-      created_at: faker.date.soon(),
-      updated_at: faker.date.soon(),
-      email,
-      name: faker.internet.userName(),
-      password: faker.internet.password(),
-      isVerified: true,
+    await userRepository.add({
+      ...user_mock,
     });
 
-    const body_request = {
-      body: {
-        email,
-      },
-    };
-
-    const httpResponse = await sendVerifyEmailController.handle(body_request);
+    const httpResponse = await sendVerifyEmailController.handle(http_request);
 
     expect(httpResponse.statusCode).toBe(200);
   });
 
   it('should returns a not found status if the email is no registered', async () => {
-    const body_request = {
-      body: {
-        email: faker.internet.email(),
-      },
-    };
-
-    const httpResponse = await sendVerifyEmailController.handle(body_request);
+    const httpResponse = await sendVerifyEmailController.handle(http_request);
 
     expect(httpResponse).toEqual(notFound(new UserNotFoundError()));
   });
@@ -156,17 +135,11 @@ describe('send verify email', () => {
   });
 
   it('should return a sever error status if sendForgotPasswordEmailUseCase.execute() throws an error', async () => {
-    const body_request = {
-      body: {
-        email: faker.internet.email(),
-      },
-    };
-
     jest
       .spyOn(sendVerifyEmailUseCase, 'execute')
       .mockRejectedValueOnce(new Error());
 
-    const httpResponse = await sendVerifyEmailController.handle(body_request);
+    const httpResponse = await sendVerifyEmailController.handle(http_request);
 
     expect(httpResponse).toEqual(serverError());
   });

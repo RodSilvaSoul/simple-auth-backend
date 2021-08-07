@@ -11,7 +11,6 @@ import { UuidFacade } from '@shared/container/providers/uuid/implementations';
 import { BodyRequestValidator } from '@shared/container/providers/validator/implementations';
 import { UserNotFoundError } from '@shared/errors/useCase';
 import { notFound, serverError } from '@shared/http';
-import { right } from '@shared/utils';
 
 import {
   SendForgotPasswordEmailUseCase,
@@ -62,9 +61,7 @@ describe('send forgot password email', () => {
     };
 
     const checkSpy = jest.spyOn(bodyRequestValidator, 'check');
-    const executeSpy = jest
-      .spyOn(sendForgotPasswordEmailUseCase, 'execute')
-      .mockResolvedValueOnce(right(true));
+    const executeSpy = jest.spyOn(sendForgotPasswordEmailUseCase, 'execute');
 
     await sendForgotPasswordEmailController.handle(httpRequest);
 
@@ -149,7 +146,7 @@ describe('send forgot password email', () => {
   it('should returns a not found status if the email is not registered', async () => {
     const httpRequest = {
       body: {
-        email: faker.internet.email(),
+        email: 'any_email',
       },
     };
 
