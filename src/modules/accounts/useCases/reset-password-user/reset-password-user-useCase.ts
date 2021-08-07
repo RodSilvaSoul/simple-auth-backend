@@ -9,8 +9,6 @@ import { IDateProvider, IHasherProvider } from '@shared/container/providers';
 import { InvalidTokenError, UserNotFoundError } from '@shared/errors/useCase';
 import { Either, left, right } from '@shared/utils/either';
 
-import { AccessTokenDoesNotExist } from './errors';
-
 @injectable()
 export class ResetPasswordUserUseCase {
   constructor(
@@ -33,7 +31,7 @@ export class ResetPasswordUserUseCase {
     );
 
     if (userToken.isLeft()) {
-      return left(new AccessTokenDoesNotExist());
+      return left(new InvalidTokenError());
     }
 
     if (

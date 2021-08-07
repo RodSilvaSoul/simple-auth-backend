@@ -1,13 +1,28 @@
 import { Router } from 'express';
 import { container } from 'tsyringe';
 
-import { CreateUserController } from '@modules/accounts/useCases';
-import { expressRouterAdapter } from '@shared/adapters';
+import {
+  CreateUserController,
+  VerifyEmailController,
+} from '@modules/accounts/useCases';
+import {
+  expressMiddlewareAdapter,
+  expressRouterAdapter,
+} from '@shared/adapters';
+import { AuthMiddleware } from '@shared/middlers';
 
 const userRoutes = Router();
 
-const creteUserController = container.resolve(CreateUserController);
+const creteUserController = expressRouterAdapter(
+  container.resolve(CreateUserController),
+);
+const verifyEmailController = expressRouterAdapter(
+  container.resolve(VerifyEmailController),
+);
 
-userRoutes.post('/', expressRouterAdapter(creteUserController));
+const authMiddleware = expressMiddlewareAdapter(new AuthMiddleware());
+
+userRoutes.post('/', creteUserController);
+userRoutes.post('/verify-email', authMiddleware, verifyEmailController);
 
 export { userRoutes };

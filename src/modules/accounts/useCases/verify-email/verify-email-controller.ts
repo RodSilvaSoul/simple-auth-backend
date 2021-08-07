@@ -1,12 +1,13 @@
 import { inject, singleton } from 'tsyringe';
 
-import { InvalidTokenError } from '@shared/errors/useCase';
+import { MissingParamError } from '@shared/errors/validator';
 import {
   HttpRequest,
   HttpResponse,
   serverError,
   ok,
   unauthorized,
+  badRequest,
 } from '@shared/http';
 import { IController } from '@shared/ports';
 
@@ -24,7 +25,7 @@ export class VerifyEmailController implements IController {
       const { token } = query;
 
       if (!token) {
-        return unauthorized(new InvalidTokenError());
+        return badRequest(new MissingParamError('Token missing on the route query'));
       }
 
       const result = await this.verifyEmailUseCase.execute(token);

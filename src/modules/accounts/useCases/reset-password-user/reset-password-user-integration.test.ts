@@ -76,7 +76,7 @@ describe('reset password user : integration', () => {
       .send(user_password)
       .expect(401);
 
-    expect(http_response.body.error).toBe('Invalid token');
+    expect(http_response.body.error).toBe('Token invalid');
   });
 
   it('should not accept a request missing the reset password token', async () => {
@@ -119,6 +119,6 @@ describe('reset password user : integration', () => {
       .send(user_password)
       .expect(401);
 
-    expect(http_response.body.error).toBe('Invalid token');
+    expect(http_response.body.error).toBe('Token invalid');
   });
 });

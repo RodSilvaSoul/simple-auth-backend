@@ -12,7 +12,7 @@ import { Either, left, right } from '@shared/utils';
 export class VerifyEmailUseCase {
   constructor(
     @inject('UserRepository')
-    private readonly userRepistory: IUserRepository,
+    private readonly userRepository: IUserRepository,
     @inject('TokenRepository')
     private readonly tokenRepository: ITokenRepository,
     @inject('DayjsFacade')
@@ -36,12 +36,12 @@ export class VerifyEmailUseCase {
       return left(new InvalidTokenError());
     }
 
-    const user = await this.userRepistory.findById(id_user);
+    const user = await this.userRepository.findById(id_user);
 
     if (user.isRight()) {
       user.value.isVerified = true;
 
-      await this.userRepistory.add(user.value);
+      await this.userRepository.add(user.value);
     }
 
     await this.tokenRepository.deleteById(id);
