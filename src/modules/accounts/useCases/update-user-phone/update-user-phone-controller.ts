@@ -1,6 +1,5 @@
 import { inject, singleton } from 'tsyringe';
 
-import { UpdateUserPhoneDTO } from '@modules/accounts/dtos';
 import { IValidator } from '@shared/container/providers';
 import {
   badRequest,
@@ -22,21 +21,23 @@ export class UpdateUserPhoneController implements IController {
     private readonly validator: IValidator,
   ) {}
 
-  async handle({ body }: HttpRequest): Promise<HttpResponse> {
+  async handle({ body, params }: HttpRequest): Promise<HttpResponse> {
     try {
       const isBodyInvalid = this.validator.check({
         body,
-        fields: ['id_user'],
+        fields: ['type', 'phone_number'],
       });
 
       if (isBodyInvalid.isLeft()) {
         return badRequest(isBodyInvalid.value);
       }
 
-      const { id_user, phone_number, type } = body as UpdateUserPhoneDTO;
+      const { id } = params;
+
+      const { phone_number, type } = body;
 
       const result = await this.updateUserPhoneUseCase.execute({
-        id_user,
+        id_user: id,
         phone_number,
         type,
       });
@@ -45,12 +46,7 @@ export class UpdateUserPhoneController implements IController {
         return badRequest(result.value);
       }
 
-      return ok({
-        message: 'Updated successfully',
-        data: {
-          ...result.value,
-        },
-      });
+      return ok(result.value);
     } catch (error) {
       return serverError();
     }
