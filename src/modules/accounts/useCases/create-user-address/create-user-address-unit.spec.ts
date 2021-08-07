@@ -15,7 +15,6 @@ import {
   MissingParamError,
 } from '@shared/errors/validator';
 import { badRequest, serverError } from '@shared/http';
-import { left, right } from '@shared/utils';
 
 import { CreateUserAddressController } from './create-user-address-controller';
 import { CreateUserAddressUseCase } from './create-user-address-useCase';
@@ -28,19 +27,20 @@ let userRepository: UserRepositoryInMemory;
 let bodyRequestValidator: BodyRequestValidator;
 let createUserAddressParamsValidator: CreateUserAddressParamsValidator;
 
+const user_mock = {
+  id: faker.datatype.uuid(),
+  email: 'any_email',
+  name: 'any_name',
+  password: 'any_password',
+};
+
 const user_address_mock = {
   city: 'any_city',
   state: 'any_state',
   district: 'any_district',
   house_number: 1,
-  id_user: faker.datatype.uuid(),
+  id_user: user_mock.id,
   postal_code: 'any_postal_code',
-};
-
-const user_mock = {
-  email: 'any_email',
-  name: 'any_name',
-  password: 'any_password',
 };
 
 const http_request = {
@@ -67,15 +67,16 @@ describe('Create user address: unit', () => {
     );
   });
   it('should createUserAddressUseCase call your methods correctly', async () => {
-    const findByIdSpy = jest
-      .spyOn(userRepository, 'findById')
-      .mockResolvedValueOnce(right(user_mock as any));
+    await userRepository.add({
+
+      ...user_mock,
+    });
+
+    const findByIdSpy = jest.spyOn(userRepository, 'findById');
 
     const saveSpy = jest.spyOn(userAddressRepository, 'save');
     const checkSpy = jest.spyOn(createUserAddressParamsValidator, 'check');
-    const findByUserIdSpy = jest
-      .spyOn(userAddressRepository, 'findByUserId')
-      .mockResolvedValueOnce(left(new Error()));
+    const findByUserIdSpy = jest.spyOn(userAddressRepository, 'findByUserId');
 
     await createUserAddressUseCase.execute(user_address_mock);
 
@@ -100,13 +101,9 @@ describe('Create user address: unit', () => {
   });
 
   it('should create a new user address for a registered user', async () => {
-    jest
-      .spyOn(userRepository, 'findById')
-      .mockResolvedValueOnce(right(user_mock as any));
-
-    jest
-      .spyOn(userAddressRepository, 'findByUserId')
-      .mockResolvedValueOnce(left(new Error()));
+    await userRepository.add({
+      ...user_mock,
+    });
 
     const http_response = await createUserAddressController.handle(
       http_request,
@@ -156,13 +153,13 @@ describe('Create user address: unit', () => {
   });
 
   it('should not create a user address if the user already have one', async () => {
-    jest
-      .spyOn(userRepository, 'findById')
-      .mockResolvedValueOnce(right(user_mock as any));
+    await userRepository.add({
+      ...user_mock,
+    });
 
-    jest
-      .spyOn(userAddressRepository, 'findByUserId')
-      .mockResolvedValueOnce(right({} as any));
+    await userAddressRepository.save({
+      ...user_address_mock,
+    });
 
     const http_response = await createUserAddressController.handle(
       http_request,
@@ -185,9 +182,7 @@ describe('Create user address: unit', () => {
     });
 
     expect(http_response).toEqual(
-      badRequest(
-        new InvalidParamError('The param postal_code is not valid'),
-      ),
+      badRequest(new InvalidParamError('The param postal_code is not valid')),
     );
   });
 

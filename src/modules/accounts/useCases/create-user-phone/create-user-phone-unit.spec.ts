@@ -27,9 +27,11 @@ const user_mock = {
   id: faker.datatype.uuid(),
   email: 'user@example.com',
   password: 'any_password',
+  name: 'any_name',
 };
 
 const user_phone_mock = {
+  id_user: user_mock.id,
   phone_number: 'any_phone_number',
   type: 'any_type',
 };
@@ -62,34 +64,24 @@ describe('create user phone : unit', () => {
   });
 
   it('should createUserPhoneUseCase call your methods correctly', async () => {
-    const user_phone = {
-      phone_number: 'any_phone_number',
-      type: 'any_type',
-      id_user: user_mock.id,
-    };
+    await userRepository.add({
+      ...user_mock,
+    });
 
-    const findByIdSpy = jest
-      .spyOn(userRepository, 'findById')
-      .mockResolvedValueOnce(right(user_mock as any));
-    const createOrUpdateSpy = jest.spyOn(userPhoneRepository, 'save');
     const checkSpy = jest.spyOn(createUserPhoneParamsValidator, 'check');
+    const findByIdSpy = jest.spyOn(userRepository, 'findById');
     const findByUserIdSpy = jest.spyOn(userPhoneRepository, 'findByUserId');
+    const saveSpy = jest.spyOn(userPhoneRepository, 'save');
 
-    await createUserPhoneUseCase.execute(user_phone);
+    await createUserPhoneUseCase.execute(user_phone_mock);
 
-    expect(findByIdSpy).toBeCalledWith(user_phone.id_user);
-    expect(createOrUpdateSpy).toBeCalledWith(user_phone);
-    expect(checkSpy).toBeCalledWith(user_phone);
-    expect(findByUserIdSpy).toBeCalledWith(user_phone.id_user);
+    expect(checkSpy).toBeCalledWith(user_phone_mock);
+    expect(findByIdSpy).toBeCalledWith(user_phone_mock.id_user);
+    expect(findByUserIdSpy).toBeCalledWith(user_phone_mock.id_user);
+    expect(saveSpy).toBeCalledWith(user_phone_mock);
   });
 
   it('should createUserPhoneController call your methods correctly', async () => {
-    const user_phone = {
-      phone_number: 'any_phone_number',
-      type: 'any_type',
-      id_user: user_mock.id,
-    };
-
     const checkSpy = jest.spyOn(bodyRequestValidator, 'check');
     const executeSpy = jest.spyOn(createUserPhoneUseCase, 'execute');
 
@@ -99,18 +91,21 @@ describe('create user phone : unit', () => {
       body: user_phone_mock,
       fields: ['type', 'phone_number'],
     });
-    expect(executeSpy).toBeCalledWith(user_phone);
+    expect(executeSpy).toBeCalledWith(user_phone_mock);
   });
 
   it('should create a new user phone for a registered user', async () => {
-    jest
-      .spyOn(userRepository, 'findById')
-      .mockResolvedValueOnce(right(user_mock as any));
-
+    await userRepository.add({
+      ...user_mock,
+    });
     const http_response = await createUserPhoneController.handle(http_request);
 
+    const result_data = {
+      type: user_phone_mock.type,
+      phone_number: user_phone_mock.phone_number,
+    };
     expect(http_response.statusCode).toBe(201);
-    expect(http_response.body).toEqual(user_phone_mock);
+    expect(http_response.body).toEqual(result_data);
   });
 
   it('should not accept a empty body request', async () => {
@@ -179,7 +174,9 @@ describe('create user phone : unit', () => {
   });
 
   it('should returns a server error if createUserPhoneUseCase throws an error ', async () => {
-    jest.spyOn(createUserPhoneUseCase, 'execute').mockRejectedValueOnce(new Error());
+    jest
+      .spyOn(createUserPhoneUseCase, 'execute')
+      .mockRejectedValueOnce(new Error());
 
     const http_response = await createUserPhoneController.handle(http_request);
 

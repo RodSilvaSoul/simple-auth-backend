@@ -110,12 +110,12 @@ describe('create user phone : unit', () => {
 
     expect(http_response.statusCode).toBe(200);
 
-    const resultData = {
+    const result_data = {
       type: user_phone_mock.type,
       phone_number: user_phone_mock.phone_number,
     };
 
-    expect(http_response.body).toEqual(resultData);
+    expect(http_response.body).toEqual(result_data);
   });
 
   it('should not accept a empty body request', async () => {
