@@ -3,28 +3,28 @@ import { inject, singleton } from 'tsyringe';
 import { MissingParamError } from '@shared/errors/validator';
 import {
   badRequest,
+  created,
   HttpRequest,
   HttpResponse,
-  ok,
   serverError,
   unauthorized,
 } from '@shared/http';
 import { IController } from '@shared/ports';
 
-import { RefreshTokeUseCase } from './refresh-token-useCase';
+import { RefreshTokenUseCase } from './refresh-token-useCase';
 
 @singleton()
 export class RefreshTokenController implements IController {
   constructor(
-    @inject('RefreshTokeUseCase')
-    private readonly refreshTokenUseCase: RefreshTokeUseCase,
+    @inject('RefreshTokenUseCase')
+    private readonly refreshTokenUseCase: RefreshTokenUseCase,
   ) {}
 
   async handle(request: HttpRequest): Promise<HttpResponse> {
     try {
       const token = request.body.token
         || request.query.token
-        || request.headers['x-access-token'];
+        || request.headers['x-refresh-token'];
 
       if (!token) {
         return badRequest(new MissingParamError('Missing token'));
@@ -36,7 +36,7 @@ export class RefreshTokenController implements IController {
         return unauthorized(result.value);
       }
 
-      return ok(result.value);
+      return created(result.value);
     } catch (error) {
       return serverError();
     }

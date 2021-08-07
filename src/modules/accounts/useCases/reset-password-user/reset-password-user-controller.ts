@@ -1,7 +1,7 @@
 import { singleton, inject } from 'tsyringe';
 
 import { IValidator } from '@shared/container/providers';
-import { InvalidTokenError } from '@shared/errors/useCase';
+import { MissingParamError } from '@shared/errors/validator';
 import {
   badRequest,
   HttpRequest,
@@ -33,9 +33,15 @@ export class ResetPasswordUserController implements IController {
       if (isBodyValid.isLeft()) {
         return badRequest(isBodyValid.value);
       }
+
       const { token } = query;
+
       if (!token) {
-        return badRequest(new InvalidTokenError());
+        return badRequest(
+          new MissingParamError(
+            'Missing the reset password token on the request query',
+          ),
+        );
       }
 
       const { password } = body;

@@ -1,7 +1,7 @@
 /* eslint-disable max-classes-per-file */
 export class InvalidRefreshToken extends Error {
   constructor() {
-    super('Invalid refreshToken');
+    super('Invalid refresh token');
     this.name = 'InvalidRefreshToken';
   }
 }

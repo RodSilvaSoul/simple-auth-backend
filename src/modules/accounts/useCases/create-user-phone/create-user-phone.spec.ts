@@ -1,6 +1,5 @@
 import faker from 'faker';
 
-import { CreateUserPhoneDTO } from '@modules/accounts/dtos';
 import {
   UserPhoneInMemory,
   UserRepositoryInMemory,

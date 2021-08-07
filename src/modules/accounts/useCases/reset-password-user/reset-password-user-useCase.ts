@@ -6,14 +6,16 @@ import {
   IUserRepository,
 } from '@modules/accounts/repositories';
 import { IDateProvider, IHasherProvider } from '@shared/container/providers';
-import { InvalidTokenError } from '@shared/errors/useCase';
+import { InvalidTokenError, UserNotFoundError } from '@shared/errors/useCase';
 import { Either, left, right } from '@shared/utils/either';
+
+import { AccessTokenDoesNotExist } from './errors';
 
 @injectable()
 export class ResetPasswordUserUseCase {
   constructor(
     @inject('UserRepository')
-    private readonly userRepistory: IUserRepository,
+    private readonly userRepository: IUserRepository,
     @inject('TokenRepository')
     private readonly tokenRepository: ITokenRepository,
     @inject('DayjsFacade')
@@ -25,11 +27,13 @@ export class ResetPasswordUserUseCase {
   async execute({
     token,
     password,
-  }: ResetPasswordDTO): Promise<Either<InvalidTokenError, true>> {
-    const userToken = await this.tokenRepository.findByToken(token.replace('\n', ''));
+  }: ResetPasswordDTO): Promise<Either<Error, true>> {
+    const userToken = await this.tokenRepository.findByToken(
+      token.replace('\n', ''),
+    );
 
     if (userToken.isLeft()) {
-      return left(new InvalidTokenError());
+      return left(new AccessTokenDoesNotExist());
     }
 
     if (
@@ -43,11 +47,15 @@ export class ResetPasswordUserUseCase {
 
     const { id_user, id } = userToken.value;
 
-    const user = await this.userRepistory.findById(id_user);
+    const user = await this.userRepository.findById(id_user);
+
+    if (user.isLeft()) {
+      return left(new UserNotFoundError());
+    }
 
     if (user.isRight()) {
       user.value.password = await this.hasherProvider.hash(password);
-      await this.userRepistory.add(user.value);
+      await this.userRepository.add(user.value);
 
       await this.tokenRepository.deleteById(id);
     }

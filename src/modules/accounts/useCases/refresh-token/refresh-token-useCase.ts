@@ -13,7 +13,7 @@ type Response = {
 };
 
 @injectable()
-export class RefreshTokeUseCase {
+export class RefreshTokenUseCase {
   constructor(
     @inject('TokenRepository')
     private readonly tokenRepository: ITokenRepository,
