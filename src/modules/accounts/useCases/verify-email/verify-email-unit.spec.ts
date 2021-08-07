@@ -6,7 +6,8 @@ import {
 } from '@modules/accounts/repositories/in-memory';
 import { DayjsFacade } from '@shared/container/providers/date/implementations';
 import { InvalidTokenError } from '@shared/errors/useCase';
-import { serverError, unauthorized } from '@shared/http';
+import { MissingParamError } from '@shared/errors/validator';
+import { badRequest, serverError, unauthorized } from '@shared/http';
 
 import { VerifyEmailUseCase, VerifyEmailController } from '.';
 
@@ -16,7 +17,27 @@ let userRepository: UserRepositoryInMemory;
 let verifyEmailUseCase: VerifyEmailUseCase;
 let verifyEmailController: VerifyEmailController;
 
-describe('verify email ', () => {
+const user_mock = {
+  id: faker.datatype.uuid(),
+  name: 'any_name',
+  password: 'any_password',
+  email: 'any_email',
+};
+
+const user_token_mock = {
+  id: faker.datatype.uuid(),
+  id_user: user_mock.id,
+  token: 'any_token',
+  expires_in: faker.date.future(),
+};
+
+const http_request = {
+  query: {
+    token: 'any_token',
+  },
+};
+
+describe('verify email :unit', () => {
   beforeEach(() => {
     tokenRepository = new TokenRepositoryInMemory();
     dayjsFacade = new DayjsFacade();
@@ -29,31 +50,14 @@ describe('verify email ', () => {
     verifyEmailController = new VerifyEmailController(verifyEmailUseCase);
   });
   it('should verifyEmailUseCase call your methods correctly', async () => {
-    const token = faker.datatype.uuid();
-    const id_user = faker.datatype.uuid();
-    const id_token = faker.datatype.uuid();
-    const expires_in = faker.date.future();
     const recent_date = faker.date.recent();
-    const user = {} as any;
 
-    tokenRepository.refreshTokens.push({
-      id: id_token,
-      id_user,
-      expires_in,
-      token,
-      created_at: faker.date.recent(),
-      user,
+    await userRepository.add({
+      ...user_mock,
     });
 
-    userRepository.users.push({
-      id: id_user,
-      avatar_url: 'any_url',
-      created_at: faker.date.soon(),
-      updated_at: faker.date.soon(),
-      email: faker.internet.email(),
-      name: faker.internet.userName(),
-      password: faker.internet.password(),
-      isVerified: false,
+    await tokenRepository.add({
+      ...user_token_mock,
     });
 
     const findByTokenSpy = jest.spyOn(tokenRepository, 'findByToken');
@@ -65,63 +69,38 @@ describe('verify email ', () => {
     const addSpy = jest.spyOn(userRepository, 'add');
     const deleteByIdSpy = jest.spyOn(tokenRepository, 'deleteById');
 
-    await verifyEmailUseCase.execute(token);
+    await verifyEmailUseCase.execute('any_token');
 
-    expect(findByTokenSpy).toBeCalledWith(token);
+    expect(findByTokenSpy).toBeCalledWith('any_token');
     expect(dateNowSpy).toBeCalled();
-    expect(compareIfBeforeSpy).toBeCalledWith(expires_in, recent_date);
-    expect(findByIdSpy).toBeCalledWith(id_user);
+    expect(compareIfBeforeSpy).toBeCalledWith(user_token_mock.expires_in, recent_date);
+    expect(findByIdSpy).toBeCalledWith(user_token_mock.id_user);
     expect(addSpy).toBeCalledWith(
       expect.objectContaining({
         isVerified: true,
       }),
     );
-    expect(deleteByIdSpy).toBeCalledWith(id_token);
+    expect(deleteByIdSpy).toBeCalledWith(user_token_mock.id);
   });
 
   it('should verifyEmailController call your methods correctly', async () => {
-    const token = faker.datatype.uuid();
-
-    const request = {
-      query: {
-        token,
-      },
-    };
-
     const executeSpy = jest.spyOn(verifyEmailUseCase, 'execute');
 
-    await verifyEmailController.handle(request);
+    await verifyEmailController.handle(http_request);
 
-    expect(executeSpy).toBeCalledWith(token);
+    expect(executeSpy).toBeCalledWith('any_token');
   });
 
   it('should verify a email of a registered user', async () => {
-    const token = faker.datatype.uuid();
-
     await tokenRepository.add({
-      token,
-      expires_in: faker.date.future(),
-      id_user: faker.datatype.uuid(),
+      ...user_token_mock,
     });
 
-    userRepository.users.push({
-      id: faker.datatype.uuid(),
-      avatar_url: 'any_url',
-      created_at: faker.date.soon(),
-      updated_at: faker.date.soon(),
-      email: faker.internet.email(),
-      name: faker.internet.userName(),
-      password: faker.internet.password(),
-      isVerified: false,
+    await userRepository.add({
+      ...user_mock,
     });
 
-    const request = {
-      query: {
-        token,
-      },
-    };
-
-    const httpResponse = await verifyEmailController.handle(request);
+    const httpResponse = await verifyEmailController.handle(http_request);
 
     expect(httpResponse.statusCode).toBe(200);
   });
@@ -129,52 +108,39 @@ describe('verify email ', () => {
   it('should not accept a request missing the token in the query', async () => {
     const httpResponse = await verifyEmailController.handle({ query: {} });
 
-    expect(httpResponse).toEqual(unauthorized(new InvalidTokenError()));
+    expect(httpResponse).toEqual(
+      badRequest(new MissingParamError('Token missing on the route query')),
+    );
   });
 
   it('should not accept a invalid token', async () => {
-    const request = {
+    const http_request = {
       query: {
-        token: faker.datatype.uuid(),
+        token: 'token invalid',
       },
     };
 
-    const httpResponse = await verifyEmailController.handle(request);
+    const httpResponse = await verifyEmailController.handle(http_request);
 
     expect(httpResponse).toEqual(unauthorized(new InvalidTokenError()));
   });
 
   it('should not accept a expired token', async () => {
-    const token = faker.datatype.uuid();
-
     await tokenRepository.add({
-      token,
+      ...user_token_mock,
       expires_in: faker.date.past(),
-      id_user: faker.datatype.uuid(),
     });
 
-    const request = {
-      query: {
-        token,
-      },
-    };
-
-    const httpResponse = await verifyEmailController.handle(request);
+    const httpResponse = await verifyEmailController.handle(http_request);
     expect(httpResponse).toEqual(unauthorized(new InvalidTokenError()));
   });
 
   it('should return a sever error if verifyEmailUseCase.execute() throws an error', async () => {
-    const request = {
-      query: {
-        token: faker.datatype.uuid(),
-      },
-    };
-
     jest
       .spyOn(verifyEmailUseCase, 'execute')
       .mockRejectedValueOnce(new Error());
 
-    const httpResponse = await verifyEmailController.handle(request);
+    const httpResponse = await verifyEmailController.handle(http_request);
 
     expect(httpResponse).toEqual(serverError());
   });
