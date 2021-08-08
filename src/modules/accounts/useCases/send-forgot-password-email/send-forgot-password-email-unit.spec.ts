@@ -31,7 +31,7 @@ let emailProvider: EmailProviderInMemory;
 let bodyRequestValidator: BodyRequestValidator;
 let uuidProvider: UuidFacade;
 
-describe('send forgot password email', () => {
+describe('send forgot password email: unit', () => {
   beforeEach(() => {
     dayjsFacade = new DayjsFacade();
     tokenRepository = new TokenRepositoryInMemory();
