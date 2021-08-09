@@ -18,5 +18,4 @@ module.exports = {
     ['@babel/plugin-proposal-decorators', { legacy: true }],
     ['@babel/plugin-proposal-class-properties', { loose: true }],
   ],
-  ignore: ['./src/**/*.spec.ts', './src/**/*.test.ts','./src/@types'],
 };
