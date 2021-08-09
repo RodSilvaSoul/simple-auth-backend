@@ -18,18 +18,18 @@ export class CreateUserAddressController implements IController {
     @inject('CreateUserAddressUseCase')
     private readonly createUserAddressUseCase: CreateUserAddressUseCase,
     @inject('BodyRequestValidator')
-    private readonly bodyRequestValidator: IValidator,
+    private readonly validator: IValidator,
   ) {}
 
   async handle({ body, params }: HttpRequest): Promise<HttpResponse> {
     try {
-      const haveBodyInvalidParams = this.bodyRequestValidator.check({
+      const isBodyValid = this.validator.check({
         body,
         fields: ['city', 'state', 'house_number', 'postal_code', 'district'],
       });
 
-      if (haveBodyInvalidParams.isLeft()) {
-        return badRequest(haveBodyInvalidParams.value);
+      if (isBodyValid.isLeft()) {
+        return badRequest(isBodyValid.value);
       }
 
       const { id } = params;

@@ -8,7 +8,7 @@ import { IUserRepository } from '../IUser-repository';
 export class UserRepositoryInMemory implements IUserRepository {
   users: User[] = [];
 
-  async add({
+  async save({
     email, name, password, id,
   }: CreateUserDTO): Promise<User> {
     const user = new User();

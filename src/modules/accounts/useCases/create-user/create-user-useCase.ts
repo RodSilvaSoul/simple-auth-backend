@@ -23,7 +23,7 @@ class CreatUserUseCase {
     email,
     name,
     password,
-  }: CreateUserDTO): Promise<Either<EmailAlreadyUseError, true>> {
+  }: CreateUserDTO): Promise<Either<Error, true>> {
     const haveAInvalidParam = this.validator.check({
       email,
       name,
@@ -42,7 +42,7 @@ class CreatUserUseCase {
 
     const passwordHash = await this.hasherProvider.hash(password);
 
-    await this.userRepository.add({
+    await this.userRepository.save({
       email,
       name,
       password: passwordHash,
