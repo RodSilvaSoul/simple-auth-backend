@@ -23,13 +23,13 @@ export class CreateUserPhoneController implements IController {
 
   async handle({ body, params }: HttpRequest): Promise<HttpResponse> {
     try {
-      const haveBodyInvalidParams = this.bodyRequestValidator.check({
+      const isBodyValid = this.bodyRequestValidator.check({
         body,
         fields: ['type', 'phone_number'],
       });
 
-      if (haveBodyInvalidParams.isLeft()) {
-        return badRequest(haveBodyInvalidParams.value);
+      if (isBodyValid.isLeft()) {
+        return badRequest(isBodyValid.value);
       }
 
       const { id } = params;
