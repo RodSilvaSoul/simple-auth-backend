@@ -8,7 +8,7 @@ import {
   UserRepository,
   UserAddressRepository,
   UserPhoneRepository,
-} from '@modules/accounts/infra/typorm/repositories';
+} from '@modules/accounts/infra/typeorm/repositories';
 import {
   ITokenRepository,
   IUserRepository,

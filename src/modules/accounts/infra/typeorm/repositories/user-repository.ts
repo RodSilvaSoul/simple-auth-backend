@@ -16,7 +16,7 @@ export class UserRepository implements IUserRepository {
     this.repository = getRepository(User);
   }
 
-  async add({ email, name, password }: CreateUserDTO): Promise<User> {
+  async save({ email, name, password }: CreateUserDTO): Promise<User> {
     const user = this.repository.create({
       email,
       name,

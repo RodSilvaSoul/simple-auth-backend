@@ -2,7 +2,7 @@ import { NotFoundError } from '@shared/errors/database-query';
 import { Either } from '@shared/utils';
 
 import { CreteUserTokenDTO } from '../dtos';
-import { UserTokens } from '../infra/typorm/entities';
+import { UserTokens } from '../infra/typeorm/entities';
 
 export interface ITokenRepository {
   add(params: CreteUserTokenDTO): Promise<UserTokens>;

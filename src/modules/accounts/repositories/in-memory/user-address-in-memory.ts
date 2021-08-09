@@ -2,7 +2,7 @@ import {
   CreateUserAddressDTO,
   UpdateUserAddressDTO,
 } from '@modules/accounts/dtos';
-import { UserAddress } from '@modules/accounts/infra/typorm/entities';
+import { UserAddress } from '@modules/accounts/infra/typeorm/entities';
 import { ErrorOnUpdate, NotFoundError } from '@shared/errors/database-query';
 import {
   Either, filterAvailableParams, left, right,

@@ -2,7 +2,7 @@ import { NotFoundError } from '@shared/errors/database-query';
 import { Either } from '@shared/utils';
 
 import { CreateUserDTO } from '../dtos/create-user-DTO';
-import { User } from '../infra/typorm/entities';
+import { User } from '../infra/typeorm/entities';
 
 export interface IUserRepository {
   save(params: CreateUserDTO): Promise<User>;

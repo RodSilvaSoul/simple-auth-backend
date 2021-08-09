@@ -7,7 +7,7 @@ import { Connection } from 'typeorm';
 
 import auth from '@config/auth';
 import { loadConnection } from '@config/typeorm';
-import { User, UserTokens } from '@modules/accounts/infra/typorm/entities';
+import { User, UserTokens } from '@modules/accounts/infra/typeorm/entities';
 
 import { VerifyEmailUseCase } from './verify-email-useCase';
 

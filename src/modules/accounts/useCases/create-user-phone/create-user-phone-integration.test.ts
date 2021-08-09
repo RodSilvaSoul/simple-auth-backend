@@ -11,7 +11,7 @@ import {
   User,
   UserPhone,
   UserPhoneTypes,
-} from '@modules/accounts/infra/typorm/entities';
+} from '@modules/accounts/infra/typeorm/entities';
 
 import { CreateUserPhoneUseCase } from './create-user-phone-useCase';
 

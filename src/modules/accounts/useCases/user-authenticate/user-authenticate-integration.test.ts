@@ -6,7 +6,7 @@ import { container } from 'tsyringe';
 import { Connection } from 'typeorm';
 
 import { loadConnection } from '@config/typeorm';
-import { User } from '@modules/accounts/infra/typorm/entities';
+import { User } from '@modules/accounts/infra/typeorm/entities';
 
 import { UserAuthenticateUseCase } from './user-authenticate-useCase';
 

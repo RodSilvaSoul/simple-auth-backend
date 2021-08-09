@@ -2,7 +2,7 @@ import { ErrorOnUpdate, NotFoundError } from '@shared/errors/database-query';
 import { Either } from '@shared/utils';
 
 import type { CreateUserAddressDTO, UpdateUserAddressDTO } from '../dtos';
-import { UserAddress } from '../infra/typorm/entities';
+import { UserAddress } from '../infra/typeorm/entities';
 
 export interface IUserAddressRepository {
   save(params: CreateUserAddressDTO): Promise<CreateUserAddressDTO>;

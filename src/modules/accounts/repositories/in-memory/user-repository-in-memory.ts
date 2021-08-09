@@ -1,5 +1,5 @@
 import { CreateUserDTO } from '@modules/accounts/dtos';
-import { User } from '@modules/accounts/infra/typorm/entities';
+import { User } from '@modules/accounts/infra/typeorm/entities';
 import { NotFoundError } from '@shared/errors/database-query';
 import { Either, left, right } from '@shared/utils';
 

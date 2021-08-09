@@ -7,7 +7,7 @@ import { Connection } from 'typeorm';
 
 import auth from '@config/auth';
 import { loadConnection } from '@config/typeorm';
-import { User, UserAddress } from '@modules/accounts/infra/typorm/entities';
+import { User, UserAddress } from '@modules/accounts/infra/typeorm/entities';
 
 import { CreateUserAddressUseCase } from './create-user-address-useCase';
 

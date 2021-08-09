@@ -1,5 +1,5 @@
 import { CreateUserPhoneDTO, UpdateUserPhoneDTO } from '@modules/accounts/dtos';
-import { UserPhone } from '@modules/accounts/infra/typorm/entities';
+import { UserPhone } from '@modules/accounts/infra/typeorm/entities';
 import { ErrorOnUpdate } from '@shared/errors/database-query';
 import { UserNotFoundError } from '@shared/errors/useCase';
 import {

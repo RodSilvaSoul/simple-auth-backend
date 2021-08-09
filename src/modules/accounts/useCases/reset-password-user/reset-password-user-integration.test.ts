@@ -4,7 +4,7 @@ import request, { SuperTest, Test } from 'supertest';
 import { Connection } from 'typeorm';
 
 import { loadConnection } from '@config/typeorm';
-import { User, UserTokens } from '@modules/accounts/infra/typorm/entities';
+import { User, UserTokens } from '@modules/accounts/infra/typeorm/entities';
 
 const user_mock = {
   id: faker.datatype.uuid(),
