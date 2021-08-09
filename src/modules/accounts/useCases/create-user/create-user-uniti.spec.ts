@@ -59,14 +59,14 @@ describe('create user: unit', () => {
     const hashSpy = jest
       .spyOn(bcryptFacade, 'hash')
       .mockResolvedValueOnce('any_hash');
-    const addSpy = jest.spyOn(userRepository, 'add');
+    const saveSpy = jest.spyOn(userRepository, 'save');
 
     await createUserUseCase.execute(user_mock);
 
     expect(checkSpy).toBeCalledWith(user_mock);
     expect(findByEmail).toBeCalledWith(user_mock.email);
     expect(hashSpy).toBeCalledWith(user_mock.password);
-    expect(addSpy).toBeCalledWith({
+    expect(saveSpy).toBeCalledWith({
       ...user_mock,
       password: 'any_hash',
     });

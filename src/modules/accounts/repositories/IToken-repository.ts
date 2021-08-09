@@ -5,7 +5,7 @@ import { CreteUserTokenDTO } from '../dtos';
 import { UserTokens } from '../infra/typeorm/entities';
 
 export interface ITokenRepository {
-  add(params: CreteUserTokenDTO): Promise<UserTokens>;
+  save(params: CreteUserTokenDTO): Promise<UserTokens>;
   findByUserId(userId: string): Promise<Either<NotFoundError, UserTokens>>;
   findByToken(token: string): Promise<Either<NotFoundError, UserTokens>>;
   deleteById(id: string): Promise<void>;

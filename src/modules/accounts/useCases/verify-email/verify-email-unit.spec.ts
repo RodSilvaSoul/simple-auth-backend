@@ -52,11 +52,11 @@ describe('verify email :unit', () => {
   it('should verifyEmailUseCase call your methods correctly', async () => {
     const recent_date = faker.date.recent();
 
-    await userRepository.add({
+    await userRepository.save({
       ...user_mock,
     });
 
-    await tokenRepository.add({
+    await tokenRepository.save({
       ...user_token_mock,
     });
 
@@ -66,7 +66,7 @@ describe('verify email :unit', () => {
       .spyOn(dayjsFacade, 'dateNow')
       .mockReturnValue(recent_date);
     const findByIdSpy = jest.spyOn(userRepository, 'findById');
-    const addSpy = jest.spyOn(userRepository, 'add');
+    const saveSpy = jest.spyOn(userRepository, 'save');
     const deleteByIdSpy = jest.spyOn(tokenRepository, 'deleteById');
 
     await verifyEmailUseCase.execute('any_token');
@@ -75,7 +75,7 @@ describe('verify email :unit', () => {
     expect(dateNowSpy).toBeCalled();
     expect(compareIfBeforeSpy).toBeCalledWith(user_token_mock.expires_in, recent_date);
     expect(findByIdSpy).toBeCalledWith(user_token_mock.id_user);
-    expect(addSpy).toBeCalledWith(
+    expect(saveSpy).toBeCalledWith(
       expect.objectContaining({
         isVerified: true,
       }),
@@ -92,11 +92,11 @@ describe('verify email :unit', () => {
   });
 
   it('should verify a email of a registered user', async () => {
-    await tokenRepository.add({
+    await tokenRepository.save({
       ...user_token_mock,
     });
 
-    await userRepository.add({
+    await userRepository.save({
       ...user_mock,
     });
 
@@ -126,7 +126,7 @@ describe('verify email :unit', () => {
   });
 
   it('should not accept a expired token', async () => {
-    await tokenRepository.add({
+    await tokenRepository.save({
       ...user_token_mock,
       expires_in: faker.date.past(),
     });

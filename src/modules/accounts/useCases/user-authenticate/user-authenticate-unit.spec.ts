@@ -65,7 +65,7 @@ describe('user authenticate: unit', () => {
     const email = 'any_email';
     const expires_in = faker.date.future();
 
-    await userRepository.add({
+    await userRepository.save({
       ...user_mock,
     });
 
@@ -79,7 +79,7 @@ describe('user authenticate: unit', () => {
     const addDaysSpy = jest
       .spyOn(dayjsFacade, 'addDays')
       .mockReturnValueOnce(expires_in);
-    const addSpy = jest.spyOn(tokenRepository, 'add');
+    const saveSpy = jest.spyOn(tokenRepository, 'save');
 
     await userAuthenticateUseCase.execute({
       password,
@@ -90,7 +90,7 @@ describe('user authenticate: unit', () => {
     expect(compareSpy).toBeCalledWith(password, password);
     expect(createTokenSpy).toBeCalledTimes(2);
     expect(addDaysSpy).toBeCalled();
-    expect(addSpy).toBeCalledWith(
+    expect(saveSpy).toBeCalledWith(
       expect.objectContaining({
         token: 'any_jwt',
         expires_in,
@@ -114,7 +114,7 @@ describe('user authenticate: unit', () => {
   it('should authenticate a registered user', async () => {
     const passwordHash = await bcryptFacade.hash(user_mock.password);
 
-    const { id } = await userRepository.add({
+    const { id } = await userRepository.save({
       ...user_mock,
       password: passwordHash,
     });
@@ -155,7 +155,7 @@ describe('user authenticate: unit', () => {
       },
     };
 
-    await userRepository.add(user_db);
+    await userRepository.save(user_db);
 
     const httpResponse = await userAuthenticateController.handle({
       body: {

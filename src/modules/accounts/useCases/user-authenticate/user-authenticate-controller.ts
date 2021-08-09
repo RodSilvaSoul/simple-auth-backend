@@ -19,12 +19,12 @@ export class UserAuthenticateController implements IController {
     @inject('UserAuthenticateUseCase')
     private readonly userAuthenticateUseCase: UserAuthenticateUseCase,
     @inject('BodyRequestValidator')
-    private readonly bodyRequestValidator: IValidator,
+    private readonly validator: IValidator,
   ) {}
 
   async handle({ body }: HttpRequest): Promise<HttpResponse> {
     try {
-      const isBodyValid = this.bodyRequestValidator.check({
+      const isBodyValid = this.validator.check({
         body,
         fields: ['password', 'email'],
       });

@@ -63,7 +63,7 @@ describe('create user phone : unit', () => {
   });
 
   it('should updateUserPhoneUseCase call your methods correctly', async () => {
-    await userRepository.add({
+    await userRepository.save({
       ...user_mock,
     });
 
@@ -98,7 +98,7 @@ describe('create user phone : unit', () => {
   });
 
   it('should update a new user phone for a registered user', async () => {
-    await userRepository.add({
+    await userRepository.save({
       ...user_mock,
     });
 

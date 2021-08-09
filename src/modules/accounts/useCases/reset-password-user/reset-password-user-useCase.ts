@@ -53,7 +53,7 @@ export class ResetPasswordUserUseCase {
 
     if (user.isRight()) {
       user.value.password = await this.hasherProvider.hash(password);
-      await this.userRepository.add(user.value);
+      await this.userRepository.save(user.value);
 
       await this.tokenRepository.deleteById(id);
     }

@@ -23,13 +23,13 @@ export class UpdateUserAddressController implements IController {
 
   async handle({ body, params }: HttpRequest): Promise<HttpResponse> {
     try {
-      const haveBodyInvalidParams = this.validator.check({
+      const isBodyValid = this.validator.check({
         body,
         fields: [],
       });
 
-      if (haveBodyInvalidParams.isLeft()) {
-        return badRequest(haveBodyInvalidParams.value);
+      if (isBodyValid.isLeft()) {
+        return badRequest(isBodyValid.value);
       }
 
       const { id } = params;

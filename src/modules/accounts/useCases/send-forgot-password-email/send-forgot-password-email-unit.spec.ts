@@ -97,7 +97,7 @@ describe('send forgot password email: unit', () => {
     const addDaysSpy = jest
       .spyOn(dayjsFacade, 'addDays')
       .mockReturnValueOnce(expires_in);
-    const addSpy = jest.spyOn(tokenRepository, 'add');
+    const saveSpy = jest.spyOn(tokenRepository, 'save');
     const sendMailSpy = jest.spyOn(emailProvider, 'sendMail');
 
     await sendForgotPasswordEmailUseCase.execute(email);
@@ -107,7 +107,7 @@ describe('send forgot password email: unit', () => {
     expect(createSpy).toBeCalled();
     expect(addDaysSpy).toBeCalledWith(3);
     expect(resolveSpy).toBeCalled();
-    expect(addSpy).toBeCalledWith(
+    expect(saveSpy).toBeCalledWith(
       expect.objectContaining({
         token: 'any_token',
         expires_in,

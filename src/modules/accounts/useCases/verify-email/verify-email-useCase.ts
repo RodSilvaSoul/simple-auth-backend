@@ -41,7 +41,7 @@ export class VerifyEmailUseCase {
     if (user.isRight()) {
       user.value.isVerified = true;
 
-      await this.userRepository.add(user.value);
+      await this.userRepository.save(user.value);
     }
 
     await this.tokenRepository.deleteById(id);

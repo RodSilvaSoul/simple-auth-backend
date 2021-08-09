@@ -49,7 +49,7 @@ describe('refresh token: unit', () => {
   });
 
   it('should refreshTokenUseCase call your methods correctly', async () => {
-    await tokenRepository.add({
+    await tokenRepository.save({
       ...token_mock,
     });
 
@@ -69,7 +69,7 @@ describe('refresh token: unit', () => {
     const addDaysSpy = jest
       .spyOn(dateProvider, 'addDays')
       .mockReturnValueOnce(expires_in);
-    const addSpy = jest.spyOn(tokenRepository, 'add');
+    const saveSpy = jest.spyOn(tokenRepository, 'save');
 
     await refreshTokenUseCase.execute(token);
 
@@ -79,15 +79,23 @@ describe('refresh token: unit', () => {
     expect(deleteByIdSpy).toBeCalledWith(token_mock.id);
     expect(createTokenSpy).toBeCalledTimes(2);
     expect(addDaysSpy).toBeCalledWith(auth.expires_refresh_token_days);
-    expect(addSpy).toBeCalledWith({
+    expect(saveSpy).toBeCalledWith({
       expires_in,
       id_user: id,
       token: refresh_token,
     });
   });
 
+  it('should refreshTokenController call your methods correctly', async () => {
+    const executeSpy = jest.spyOn(refreshTokenUseCase, 'execute');
+
+    await refreshTokenController.handle(http_request);
+
+    expect(executeSpy).toBeCalledWith(token);
+  });
+
   it('should accept a valid refresh token', async () => {
-    await tokenRepository.add({
+    await tokenRepository.save({
       ...token_mock,
     });
 
@@ -121,7 +129,9 @@ describe('refresh token: unit', () => {
   });
 
   it('should return a server error if refreshTokenUseCase throws a error', async () => {
-    jest.spyOn(refreshTokenUseCase, 'execute').mockRejectedValueOnce(new Error());
+    jest
+      .spyOn(refreshTokenUseCase, 'execute')
+      .mockRejectedValueOnce(new Error());
 
     const http_response = await refreshTokenController.handle(http_request);
 

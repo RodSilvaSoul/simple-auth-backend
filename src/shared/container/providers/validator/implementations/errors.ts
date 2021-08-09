@@ -14,5 +14,5 @@ export enum PHONE_ERRORS {
 }
 
 export enum ADDRESS_ERRORS {
-  postal_code = 'he param postal_code is not valid',
+  postal_code = 'The param postal_code is not valid',
 }

@@ -8,7 +8,7 @@ import { ITokenRepository } from '../IToken-repository';
 export class TokenRepositoryInMemory implements ITokenRepository {
   refreshTokens: UserTokens[] = [];
 
-  async add({
+  async save({
     id,
     expires_in,
     id_user,

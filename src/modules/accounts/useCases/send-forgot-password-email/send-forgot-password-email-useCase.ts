@@ -55,7 +55,7 @@ export class SendForgotPasswordEmailUseCase {
 
     const expires_in = this.dateProvider.addDays(3);
 
-    await this.tokenRepository.add({
+    await this.tokenRepository.save({
       token,
       id_user: user.value.id,
       expires_in,

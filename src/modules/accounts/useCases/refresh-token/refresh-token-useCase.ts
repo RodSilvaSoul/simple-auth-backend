@@ -57,7 +57,7 @@ export class RefreshTokenUseCase {
       auth.expires_refresh_token_days,
     );
 
-    await this.tokenRepository.add({
+    await this.tokenRepository.save({
       expires_in,
       id_user,
       token: refresh_token,

@@ -93,7 +93,7 @@ export class UserAuthenticateUseCase {
       expires_refresh_token_days,
     );
 
-    await this.tokenRepository.add({
+    await this.tokenRepository.save({
       token: refreshToken,
       id_user: id,
       expires_in: refresh_token_expires_data,

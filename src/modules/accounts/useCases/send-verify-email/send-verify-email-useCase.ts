@@ -43,7 +43,7 @@ export class SendVerifyEmailUseCase {
 
     const { id, name } = userExists.value;
 
-    await this.tokenRepository.add({
+    await this.tokenRepository.save({
       token,
       expires_in,
       id_user: id,

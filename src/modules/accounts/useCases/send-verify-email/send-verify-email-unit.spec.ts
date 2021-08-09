@@ -68,7 +68,7 @@ describe('send verify email: unit', () => {
     const email = 'any_email';
     const expires_in = faker.date.future();
 
-    await userRepository.add({
+    await userRepository.save({
       ...user_mock,
     });
 
@@ -80,7 +80,7 @@ describe('send verify email: unit', () => {
     const addHoursSpy = jest
       .spyOn(dayjsFacade, 'addHours')
       .mockReturnValueOnce(expires_in);
-    const addSpy = jest.spyOn(tokenRepository, 'add');
+    const saveSpy = jest.spyOn(tokenRepository, 'save');
     const sendMail = jest.spyOn(emailProvider, 'sendMail');
 
     await sendVerifyEmailUseCase.execute(email);
@@ -89,7 +89,7 @@ describe('send verify email: unit', () => {
     expect(resolveSpy).toBeCalled();
     expect(createSpy).toBeCalled();
     expect(addHoursSpy).toBeCalledWith(3);
-    expect(addSpy).toBeCalledWith(
+    expect(saveSpy).toBeCalledWith(
       expect.objectContaining({
         token: 'any_token',
         expires_in,
@@ -113,7 +113,7 @@ describe('send verify email: unit', () => {
     expect(executeSpy).toBeCalledWith(http_request.body.email);
   });
   it('should send a verify email if the user is registered ', async () => {
-    await userRepository.add({
+    await userRepository.save({
       ...user_mock,
     });
 

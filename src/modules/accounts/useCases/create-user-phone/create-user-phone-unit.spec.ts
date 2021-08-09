@@ -63,7 +63,7 @@ describe('create user phone : unit', () => {
   });
 
   it('should createUserPhoneUseCase call your methods correctly', async () => {
-    await userRepository.add({
+    await userRepository.save({
       ...user_mock,
     });
 
@@ -94,7 +94,7 @@ describe('create user phone : unit', () => {
   });
 
   it('should create a new user phone for a registered user', async () => {
-    await userRepository.add({
+    await userRepository.save({
       ...user_mock,
     });
 
@@ -121,7 +121,7 @@ describe('create user phone : unit', () => {
   });
 
   it('should not create a user phone if the user already have one', async () => {
-    await userRepository.add({
+    await userRepository.save({
       ...user_mock,
     });
 

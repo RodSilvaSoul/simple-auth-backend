@@ -16,7 +16,7 @@ export class TokenRepository implements ITokenRepository {
     this.repository = getRepository(UserTokens);
   }
 
-  async add({
+  async save({
     expires_in,
     id_user,
     token,

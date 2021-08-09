@@ -67,11 +67,11 @@ describe('Reset password user', () => {
   it('should resetPasswordUserUseCase call your methods correctly ', async () => {
     const recent_date = faker.date.recent();
 
-    await userRepository.add({
+    await userRepository.save({
       ...user_mock,
     });
 
-    await tokenRepository.add({
+    await tokenRepository.save({
       ...user_token_mock,
     });
 
@@ -84,7 +84,7 @@ describe('Reset password user', () => {
     const hashSpy = jest
       .spyOn(bcryptFacade, 'hash')
       .mockResolvedValueOnce('any_hash');
-    const addSpy = jest.spyOn(userRepository, 'add');
+    const saveSpy = jest.spyOn(userRepository, 'save');
     const deleteByIdSpy = jest.spyOn(tokenRepository, 'deleteById');
 
     await resetPasswordUserUseCase.execute({
@@ -97,7 +97,7 @@ describe('Reset password user', () => {
     expect(compareIfBeforeSpy).toBeCalledWith(user_token_mock.expires_in, recent_date);
     expect(findByIdSpy).toBeCalledWith(user_token_mock.id_user);
     expect(hashSpy).toBeCalledWith('any_password123');
-    expect(addSpy).toBeCalledWith(
+    expect(saveSpy).toBeCalledWith(
       expect.objectContaining({
         password: 'any_hash',
       }),
@@ -123,11 +123,11 @@ describe('Reset password user', () => {
   });
 
   it('should reset a password user if the reset password token is valid', async () => {
-    await tokenRepository.add({
+    await tokenRepository.save({
       ...user_token_mock,
     });
 
-    await userRepository.add({
+    await userRepository.save({
       ...user_mock,
     });
 
@@ -143,7 +143,7 @@ describe('Reset password user', () => {
   });
 
   it('should not accept a token that is expired', async () => {
-    await tokenRepository.add({
+    await tokenRepository.save({
       ...user_token_mock,
       expires_in: faker.date.past(),
     });

@@ -70,7 +70,7 @@ describe('Create user address: unit', () => {
       ...user_address_mock,
     });
 
-    await userRepository.add({
+    await userRepository.save({
       ...user_mock,
     });
 
@@ -106,7 +106,7 @@ describe('Create user address: unit', () => {
       ...user_address_mock,
     });
 
-    await userRepository.add({
+    await userRepository.save({
       ...user_mock,
     });
 
