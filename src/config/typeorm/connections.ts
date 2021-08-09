@@ -7,7 +7,7 @@ export const loadConnection = async (): Promise<Connection> => {
     Object.assign(defaultOptions, {
       database:
         process.env.NODE_ENV === 'test'
-          ? 'ecommerce_test'
+          ? 'auth_api_test'
           : defaultOptions.database,
       host: process.env.LOCALE_ENV === 'docker' ? 'postgres' : 'localhost',
     }),
