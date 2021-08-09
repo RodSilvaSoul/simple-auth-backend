@@ -1,9 +1,9 @@
 # Description
 
-This is a simple authentication REST API, using JWT(JSON Web Token) to control user sessions.
-And with some other features, such as creating an address and telephone number for a registered user and
-reset password and verify email system with AWS-SES to send emails.created using SOLID principles and the
-TDD methodology
+This is a simple authentication REST API, using JWT (JSON Web Token) to control user sessions.
+And with some other features like creating an address and phone number for a registered user,
+password reset and email verification with AWS-SES to send emails. This project was created using the SOLID principles and the
+TDD Methodology
 
 ---
 
