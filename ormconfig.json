@@ -6,35 +6,7 @@
     "host": "localhost",
     "username": "docker",
     "password": "docker",
-    "database": "ecommerce_dev",
-    "migrations": ["./src/config/typeorm/migrations/*.ts"],
-    "entities": ["./src/modules/**/entities/*.ts"],
-    "cli": {
-      "migrationsDir": "./src/config/typeorm/migrations"
-    }
-  },
-  {
-    "name": "test",
-    "type": "postgres",
-    "port": 5432,
-    "host": "localhost",
-    "username": "docker",
-    "password": "docker",
-    "database": "ecommerce_test",
-    "migrations": ["./src/config/typeorm/migrations/*.ts"],
-    "entities": ["./src/modules/**/entities/*.ts"],
-    "cli": {
-      "migrationsDir": "./src/config/typeorm/migrations"
-    }
-  },
-  {
-    "name": "docker",
-    "type": "postgres",
-    "port": 5432,
-    "host": "docker",
-    "username": "docker",
-    "password": "docker",
-    "database": "ecommerce_dev",
+    "database": "auth_api_dev",
     "migrations": ["./src/config/typeorm/migrations/*.ts"],
     "entities": ["./src/modules/**/entities/*.ts"],
     "cli": {
