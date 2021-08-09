@@ -10,7 +10,7 @@ services:
     environment:
       - POSTGRES_PASSWORD=docker
       - POSTGRES_USER=docker
-      - POSTGRES_DB=ecommerce_dev
+      - POSTGRES_DB=auth_api_dev
   api:
     image: node:14.17
     container_name: api-docker
