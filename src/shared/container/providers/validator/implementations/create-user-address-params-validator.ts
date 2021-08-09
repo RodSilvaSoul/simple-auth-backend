@@ -6,14 +6,13 @@ import { InvalidParamError } from '@shared/errors/validator';
 import { Either, left, right } from '@shared/utils';
 
 import { IValidator } from '../IValidator';
+import { ADDRESS_ERRORS, TOKEN_ERRORS } from './errors';
 
 @injectable()
 export class CreateUserAddressParamsValidator implements IValidator {
   check(params: CreateUserAddressDTO): Either<Error, true> {
     if (!uuidValidator(params.id_user)) {
-      return left(
-        new InvalidParamError('The id_user does not have a valid uuid format'),
-      );
+      return left(new InvalidParamError(TOKEN_ERRORS.uuid));
     }
 
     const haveAParamLessThan3Characters = ['city', 'district', 'state'].find(
@@ -35,9 +34,7 @@ export class CreateUserAddressParamsValidator implements IValidator {
     }
 
     if (params.postal_code.length < 7) {
-      return left(
-        new InvalidParamError('The param postal_code is not valid'),
-      );
+      return left(new InvalidParamError(ADDRESS_ERRORS.postal_code));
     }
 
     return right(true);

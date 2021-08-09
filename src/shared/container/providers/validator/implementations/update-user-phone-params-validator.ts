@@ -7,6 +7,8 @@ import { Either, left, right } from '@shared/utils';
 
 import { IValidator } from '..';
 
+import { PHONE_ERRORS, TOKEN_ERRORS } from './errors';
+
 @injectable()
 export class UpdateUserPhoneParamsValidator implements IValidator {
   check({ id_user, ...rest }: UpdateUserPhoneDTO): Either<Error, true> {
@@ -33,20 +35,20 @@ export class UpdateUserPhoneParamsValidator implements IValidator {
 
     if (!uuidValidator(id_user)) {
       return left(
-        new InvalidParamError('The id_user does not have a valid uuid format'),
+        new InvalidParamError(TOKEN_ERRORS.uuid),
       );
     }
 
     if (rest.phone_number?.length < 9) {
       return left(
         new InvalidParamError(
-          'The param: phone_number have less than 9 characters',
+          PHONE_ERRORS.phone_number,
         ),
       );
     }
 
     if (rest.type?.length < 4) {
-      return left(new InvalidParamError('The param: type is invalid'));
+      return left(new InvalidParamError(PHONE_ERRORS.type));
     }
 
     return right(true);

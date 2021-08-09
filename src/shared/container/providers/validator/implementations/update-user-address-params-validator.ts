@@ -7,6 +7,7 @@ import { InvalidParamError, MissingParamError } from '@shared/errors/validator';
 import { Either, left, right } from '@shared/utils';
 
 import { IValidator } from '../IValidator';
+import { ADDRESS_ERRORS, TOKEN_ERRORS } from './errors';
 
 @injectable()
 export class UpdateUserAddressParamsValidator implements IValidator {
@@ -37,7 +38,7 @@ export class UpdateUserAddressParamsValidator implements IValidator {
 
     if (!uuidValidator(id_user)) {
       return left(
-        new InvalidParamError('The id_user does not have a valid uuid format'),
+        new InvalidParamError(TOKEN_ERRORS.uuid),
       );
     }
 
@@ -62,7 +63,7 @@ export class UpdateUserAddressParamsValidator implements IValidator {
 
     if (rest?.postal_code?.length < 7) {
       return left(
-        new InvalidParamError('The param postal_code is not valid'),
+        new InvalidParamError(ADDRESS_ERRORS.postal_code),
       );
     }
 
